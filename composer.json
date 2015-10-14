@@ -1,0 +1,23 @@
+{
+    "name": "bobdenotter/wp-theme",
+    "description": "Use WP themes in Bolt.",
+    "type": "bolt-extension",
+    "require": {
+        "bolt/bolt": ">=2.0.0,<3.0.0"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Bob den Otter",
+            "email": "bob@twokings.nl"
+        }
+    ],
+    "autoload": {
+        "files": [
+            "init.php"
+        ],
+        "psr-4": {
+            "Bolt\\Extension\\Yourname\\Extensionname\\": ""
+        }
+    }
+}

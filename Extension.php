@@ -1,0 +1,79 @@
+<?php
+
+namespace Bolt\Extension\Bobdenotter\WPTheme;
+
+use Bolt\Application;
+use Bolt\BaseExtension;
+
+require_once(__DIR__ . '/wp_functions.php');
+
+class Extension extends BaseExtension
+{
+
+
+    public function initialize() {
+        // $this->addCss('assets/extension.css');
+        // $this->addJavascript('assets/start.js', true);
+
+        chdir($this->app['paths']['themepath']);
+
+
+    }
+
+    public function getName()
+    {
+        return "WP Theme";
+    }
+
+
+    public function record($contenttypeslug, $slug = '') {
+
+        // dump($this->app['config']->get('general/theme'));
+
+        $phpfile = $this->app['paths']['themepath'] . '/single.php';
+
+//
+        $contenttype = $this->app['storage']->getContentType($contenttypeslug);
+
+        // If the contenttype is 'viewless', don't show the record page.
+        if (isset($contenttype['viewless']) && $contenttype['viewless'] === true) {
+            return $this->app->abort(Response::HTTP_NOT_FOUND, "Page $contenttypeslug/$slug not found.");
+        }
+
+        // Perhaps we don't have a slug. Let's see if we can pick up the 'id', instead.
+        if (empty($slug)) {
+            $slug = $this->app['request']->get('id');
+        }
+
+        $slug = $this->app['slugify']->slugify($slug);
+
+        // First, try to get it by slug.
+        $content = $this->app['storage']->getContent($contenttype['slug'], array('slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)));
+
+        if (!$content && is_numeric($slug)) {
+            // And otherwise try getting it by ID
+            $content = $this->app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
+        }
+
+        $GLOBALS['content'] = $content;
+        $GLOBALS['config'] = $this->app['config'];
+        $GLOBALS['request'] = $this->app['request'];
+        $GLOBALS['paths'] = $this->app['paths'];
+
+        ob_start();
+
+        require_once('single.php');
+
+        $html = ob_get_clean();
+
+        return $html;
+
+    }
+
+}
+
+
+
+
+
+

@@ -1,15 +1,29 @@
 <?php
 
-
-function printParameters($parameters)
+function wpPrintParameters($parameters = array())
 {
+    if (empty($parameters)) {
+        return;
+    }
+
     $res = [];
 
     foreach($parameters as $parameter) {
-        $res[] = sprintf("<tt>\"%s\"</tt>", htmlspecialchars((string) $parameter));
+        $res[] = sprintf("<tt>&quot;%s&quot;</tt>", htmlspecialchars((string) $parameter));
     }
 
     return implode(", ", $res);
+}
+
+/**
+ * Stub for edit_post_link.
+ *
+ */
+function wpStub($functionname, $arguments)
+{
+    $arguments = wpPrintParameters(func_get_args());
+
+    return " <mark>{$functionname}({$arguments})<mark> ";
 }
 
 
@@ -47,34 +61,10 @@ function the_title()
 
 }
 
-function the_content()
-{
-    return "[the_content";
-}
-
-function wp_link_pages()
-{
-    return "[wp_link_pages]";
-}
-
-function get_the_author_meta()
-{
-    return "[get_the_author_meta]";
-}
-
-function is_sticky()
-{
-    return "[is_sticky]";
-}
 
 function get_footer()
 {
     require_once('footer.php');
-}
-
-function language_attributes()
-{
-    echo "[language_attributes]";
 }
 
 function bloginfo()
@@ -105,14 +95,6 @@ function body_class()
     echo "[body_class]";
 
 }
-
-function _e()
-{
-    echo "[_e]";
-
-}
-
-
 
 function is_front_page()
 {
@@ -282,36 +264,6 @@ function get_sidebar()
 
 }
 
-function has_nav_menu()
-{
-    echo "[has_nav_menu]";
-
-}
-
-
-function is_active_sidebar()
-{
-    echo "[]";
-}
-
-function do_action()
-{
-    echo "[do_action]";
-
-}
-
-function __()
-{
-    echo "[ __]";
-
-}
-
-
-function wp_footer()
-{
-    echo "[wp_footer]";
-}
-
 
 function get_template_part($slug)
 {
@@ -323,95 +275,12 @@ function get_template_part($slug)
 
 }
 
-
-function get_avatar()
-{
-    return "[get_avatar]";
-}
-
-function get_the_author()
-{
-    return "[get_the_author]";
-}
-
-function the_author_meta()
-{
-    return "[the_author_meta]";
-}
-
-function get_author_posts_url()
-{
-    return "[get_author_posts_url]";
-}
-
-function current_theme_supports()
-{
-    return "[current_theme_supports]";
-}
-
-function get_post_format()
-{
-    return "[get_post_format]";
-}
-
-function comments_open()
-{
-    echo "[comments_open]";
-
-}
-
-function get_comments_number()
-{
-    echo "[get_comments_number]";
-
-}
-
-function the_post_navigation()
-{
-    echo "[the_post_navigation]";
-
-}
-
-function the_ID()
-{
-    echo "[the_ID]";
-
-}
-
-function post_class()
-{
-    echo "[post_class]";
-
-}
-
-function h9()
-{
-    echo "[]";
-
-}
-
 function get_template_directory()
 {
     global $paths;
     return $paths['themepath'];
 }
 
-function add_action()
-{
-    return "[add_action]";
-}
-
-
-function add_filter()
-{
-    return "[add_filter]";
-}
-
-
-function is_admin()
-{
-    return "[is_admin]";
-}
 
 function post_password_required()
 {
@@ -424,120 +293,325 @@ function is_attachment()
     return false;
 }
 
+// ------ Here be unconverted stubs. --------
+
+
+/**
+ * Stub for add_action.
+ */
+function add_action()
+{
+    echo wpStub('add_action', func_get_args());
+}
+
+/**
+ * Stub for add_filter.
+ */
+function add_filter()
+{
+    echo wpStub('add_filter', func_get_args());
+}
+
+/**
+ * Stub for is_admin.
+ */
+function is_admin()
+{
+    echo wpStub('is_admin', func_get_args());
+}
+
+/**
+ * Stub for language_attributes.
+ */
+function language_attributes()
+{
+    echo wpStub('language_attributes', func_get_args());
+}
+
+/**
+ * Stub for _e.
+ */
+function _e()
+{
+    echo wpStub('_e', func_get_args());
+}
+
+/**
+ * Stub for has_nav_menu.
+ */
+function has_nav_menu()
+{
+    echo wpStub('has_nav_menu', func_get_args());
+}
+
+/**
+ * Stub for wp_nav_menu.
+ */
+function wp_nav_menu()
+{
+    echo wpStub('wp_nav_menu', func_get_args());
+}
+
+/**
+ * Stub for is_active_sidebar.
+ */
+function is_active_sidebar()
+{
+    echo wpStub('is_active_sidebar', func_get_args());
+}
+
+/**
+ * Stub for dynamic_sidebar.
+ */
+function dynamic_sidebar()
+{
+    echo wpStub('dynamic_sidebar', func_get_args());
+}
+
+/**
+ * Stub for get_post_format.
+ */
+function get_post_format()
+{
+    echo wpStub('get_post_format', func_get_args());
+}
+
+/**
+ * Stub for the_ID.
+ */
+function the_ID()
+{
+    echo wpStub('the_ID', func_get_args());
+}
+
+/**
+ * Stub for post_class.
+ */
+function post_class()
+{
+    echo wpStub('post_class', func_get_args());
+}
 
 /**
  * Stub for has_post_thumbnail.
- *
  */
 function has_post_thumbnail()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>has_post_thumbnail({$params})<mark> ";
+    echo wpStub('has_post_thumbnail', func_get_args());
 }
 
 /**
  * Stub for is_singular.
- *
  */
 function is_singular()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>is_singular({$params})<mark> ";
+    echo wpStub('is_singular', func_get_args());
 }
 
 /**
  * Stub for the_post_thumbnail.
- *
  */
 function the_post_thumbnail()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>the_post_thumbnail({$params})<mark> ";
+    echo wpStub('the_post_thumbnail', func_get_args());
 }
 
 /**
  * Stub for is_single.
- *
  */
 function is_single()
 {
-    // global $record;
+    echo wpStub('is_single', func_get_args());
+}
 
-    $params = printParameters(func_get_args());
+/**
+ * Stub for the_content.
+ */
+function the_content()
+{
+    echo wpStub('the_content', func_get_args());
+}
 
-    return " <mark>is_single({$params})<mark> ";
+/**
+ * Stub for __.
+ */
+function __()
+{
+    echo wpStub('__', func_get_args());
+}
+
+/**
+ * Stub for wp_link_pages.
+ */
+function wp_link_pages()
+{
+    echo wpStub('wp_link_pages', func_get_args());
+}
+
+/**
+ * Stub for get_the_author_meta.
+ */
+function get_the_author_meta()
+{
+    echo wpStub('get_the_author_meta', func_get_args());
+}
+
+/**
+ * Stub for get_avatar.
+ */
+function get_avatar()
+{
+    echo wpStub('get_avatar', func_get_args());
+}
+
+/**
+ * Stub for get_the_author.
+ */
+function get_the_author()
+{
+    echo wpStub('get_the_author', func_get_args());
+}
+
+/**
+ * Stub for the_author_meta.
+ */
+function the_author_meta()
+{
+    echo wpStub('the_author_meta', func_get_args());
+}
+
+/**
+ * Stub for get_author_posts_url.
+ */
+function get_author_posts_url()
+{
+    echo wpStub('get_author_posts_url', func_get_args());
+}
+
+/**
+ * Stub for is_sticky.
+ */
+function is_sticky()
+{
+    echo wpStub('is_sticky', func_get_args());
+}
+
+/**
+ * Stub for current_theme_supports.
+ */
+function current_theme_supports()
+{
+    echo wpStub('current_theme_supports', func_get_args());
 }
 
 /**
  * Stub for _x.
- *
  */
 function _x()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>_x({$params})<mark> ";
+    echo wpStub('_x', func_get_args());
 }
 
 /**
  * Stub for get_post_format_link.
- *
  */
 function get_post_format_link()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>get_post_format_link({$params})<mark> ";
+    echo wpStub('get_post_format_link', func_get_args());
 }
 
 /**
  * Stub for get_post_format_string.
- *
  */
 function get_post_format_string()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>get_post_format_string({$params})<mark> ";
+    echo wpStub('get_post_format_string', func_get_args());
 }
 
 /**
  * Stub for get_post_type.
- *
  */
 function get_post_type()
 {
-    // global $record;
-
-    $params = printParameters(func_get_args());
-
-    return " <mark>get_post_type({$params})<mark> ";
+    echo wpStub('get_post_type', func_get_args());
 }
 
 /**
  * Stub for edit_post_link.
- *
  */
 function edit_post_link()
 {
-    // global $record;
+    echo wpStub('edit_post_link', func_get_args());
+}
 
-    $params = printParameters(func_get_args());
+/**
+ * Stub for comments_open.
+ */
+function comments_open()
+{
+    echo wpStub('comments_open', func_get_args());
+}
 
-    return " <mark>edit_post_link({$params})<mark> ";
+/**
+ * Stub for comments_template.
+ */
+function comments_template()
+{
+    echo wpStub('comments_template', func_get_args());
+}
+
+/**
+ * Stub for the_post_navigation.
+ */
+function the_post_navigation()
+{
+    echo wpStub('the_post_navigation', func_get_args());
+}
+
+/**
+ * Stub for do_action.
+ */
+function do_action()
+{
+    echo wpStub('do_action', func_get_args());
+}
+
+/**
+ * Stub for wp_footer.
+ */
+function wp_footer()
+{
+    echo wpStub('wp_footer', func_get_args());
+}
+
+/**
+ * Stub for get_permalink.
+ */
+function get_permalink()
+{
+    return wpStub('get_permalink', func_get_args());
+}
+
+/**
+ * Stub for get_comments_number.
+ */
+function get_comments_number()
+{
+    return wpStub('get_comments_number', func_get_args());
+}
+
+/**
+ * Stub for comments_popup_link.
+ */
+function comments_popup_link()
+{
+    return wpStub('comments_popup_link', func_get_args());
+}
+
+/**
+ * Stub for get_the_title.
+ */
+function get_the_title()
+{
+    return wpStub('get_the_title', func_get_args());
 }

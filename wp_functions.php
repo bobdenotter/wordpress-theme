@@ -9,7 +9,12 @@ function wpPrintParameters($parameters = array())
     $res = [];
 
     foreach($parameters as $parameter) {
-        $res[] = sprintf("<tt>&quot;%s&quot;</tt>", htmlspecialchars((string) $parameter));
+
+        if (is_array($parameter)) {
+            $res[] = " [ " . wpPrintParameters($parameter) . " ] ";
+        } else {
+            $res[] = sprintf("<tt>&quot;%s&quot;</tt>", htmlspecialchars((string) $parameter));
+        }
     }
 
     return implode(", ", $res);
@@ -21,9 +26,15 @@ function wpPrintParameters($parameters = array())
  */
 function wpStub($functionname, $arguments)
 {
-    $arguments = wpPrintParameters(func_get_args());
+    global $markCssOutputted;
+    $arguments = wpPrintParameters($arguments);
 
-    return " <mark>{$functionname}({$arguments})<mark> ";
+    if (!$markCssOutputted) {
+        echo "<style>mark { background-color: #fff9c0; text-decoration: none; border: 1px solid #DDB; padding: 1px 3px; display: inline-block; font-size: 13px; } </style>";
+        $markCssOutputted = true;
+    }
+
+    echo " <mark>{$functionname}({$arguments})</mark> ";
 }
 
 
@@ -293,15 +304,15 @@ function is_attachment()
     return false;
 }
 
-// ------ Here be unconverted stubs. --------
-
-
 /**
  * Stub for add_action.
  */
 function add_action()
 {
-    echo wpStub('add_action', func_get_args());
+
+    // @todo: Do something with this.
+
+    // echo wpStub('add_action', func_get_args());
 }
 
 /**
@@ -309,8 +320,14 @@ function add_action()
  */
 function add_filter()
 {
-    echo wpStub('add_filter', func_get_args());
+    // echo wpStub('add_filter', func_get_args());
 }
+
+
+// ------ Here be unconverted stubs. --------
+
+
+
 
 /**
  * Stub for is_admin.

@@ -3,11 +3,10 @@
 
 function printParameters($parameters)
 {
-
     $res = [];
 
     foreach($parameters as $parameter) {
-        $res = sprintf("%s", (string) $parameters);
+        $res[] = sprintf("<tt>\"%s\"</tt>", htmlspecialchars((string) $parameter));
     }
 
     return implode(", ", $res);
@@ -425,16 +424,58 @@ function is_attachment()
     return false;
 }
 
+
+/**
+ * Stub for has_post_thumbnail.
+ *
+ */
 function has_post_thumbnail()
 {
-    return false;
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>has_post_thumbnail({$params})<mark> ";
 }
 
+/**
+ * Stub for is_singular.
+ *
+ */
+function is_singular()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>is_singular({$params})<mark> ";
+}
+
+/**
+ * Stub for the_post_thumbnail.
+ *
+ */
+function the_post_thumbnail()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>the_post_thumbnail({$params})<mark> ";
+}
+
+/**
+ * Stub for is_single.
+ *
+ */
 function is_single()
 {
-    return "[is_single]";
-}
+    // global $record;
 
+    $params = printParameters(func_get_args());
+
+    return " <mark>is_single({$params})<mark> ";
+}
 
 /**
  * Stub for _x.
@@ -446,9 +487,57 @@ function _x()
 
     $params = printParameters(func_get_args());
 
-    return "<mark>_x()<mark>";
+    return " <mark>_x({$params})<mark> ";
 }
 
+/**
+ * Stub for get_post_format_link.
+ *
+ */
+function get_post_format_link()
+{
+    // global $record;
 
+    $params = printParameters(func_get_args());
 
+    return " <mark>get_post_format_link({$params})<mark> ";
+}
 
+/**
+ * Stub for get_post_format_string.
+ *
+ */
+function get_post_format_string()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>get_post_format_string({$params})<mark> ";
+}
+
+/**
+ * Stub for get_post_type.
+ *
+ */
+function get_post_type()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>get_post_type({$params})<mark> ";
+}
+
+/**
+ * Stub for edit_post_link.
+ *
+ */
+function edit_post_link()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return " <mark>edit_post_link({$params})<mark> ";
+}

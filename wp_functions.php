@@ -60,16 +60,28 @@ function the_post()
 }
 
 
+/**
+ * Display or retrieve the current post title with optional content.
+ *
+ * @since 0.71
+ *
+ * @param string $before Optional. Content to prepend to the title.
+ * @param string $after  Optional. Content to append to the title.
+ * @param bool   $echo   Optional, default to true.Whether to display or return.
+ * @return string|void String if $echo parameter is false.
+ */
+function the_title( $before = '', $after = '', $echo = true ) {
+    $title = get_the_title();
 
-function the_title()
-{
-    global $record;
-    // dump($GLOBALS['content']);
+    if ( strlen($title) == 0 )
+        return;
 
-    // $GLOBALS['content'] = null;
+    $title = $before . $title . $after;
 
-    return $record->title();
-
+    if ( $echo )
+        echo $title;
+    else
+        return $title;
 }
 
 
@@ -259,7 +271,7 @@ function get_bloginfo($show = '', $filter = 'raw')
         return $output;
 }
 
-function apply_filters($filter, $output, $show)
+function apply_filters($filter, $output, $show = false)
 {
     return $output;
 }
@@ -394,19 +406,26 @@ function get_post_format()
 }
 
 /**
- * Stub for the_ID.
+ * Display the ID of the current item in the WordPress Loop.
+ *
+ * @since 0.71
  */
-function the_ID()
-{
-    wpStub('the_ID', func_get_args());
+function the_ID() {
+    echo get_the_ID();
 }
 
+
 /**
- * Stub for post_class.
+ * Display the classes for the post div.
+ *
+ * @since 2.7.0
+ *
+ * @param string|array $class One or more classes to add to the class list.
+ * @param int|WP_Post $post_id Optional. Post ID or post object.
  */
-function post_class()
-{
-    wpStub('post_class', func_get_args());
+function post_class( $class = '', $post_id = null ) {
+    // Separates classes with a single space, collates classes for post DIV
+    echo 'class="' . join( ' ', get_post_class( $class, $post_id ) ) . '"';
 }
 
 /**
@@ -438,23 +457,43 @@ function the_post_thumbnail()
  */
 function is_single()
 {
-    wpStub('is_single', func_get_args());
+    global $request;
+
+    $route = $request->get('_route');
+    $okroutes = [ 'wp-contentlink' ];
+
+    return in_array($route, $okroutes);
 }
 
 /**
- * Stub for the_content.
+ * Display the post content.
+ *
+ * @since 0.71
+ *
+ * @param string $more_link_text Optional. Content for when there is more text.
+ * @param bool   $strip_teaser   Optional. Strip teaser content before the more text. Default is false.
  */
-function the_content()
-{
-    wpStub('the_content', func_get_args());
+function the_content( $more_link_text = null, $strip_teaser = false) {
+    $content = get_the_content( $more_link_text, $strip_teaser );
+
+    /**
+     * Filter the post content.
+     *
+     * @since 0.71
+     *
+     * @param string $content Content of the current post.
+     */
+    $content = apply_filters( 'the_content', $content );
+    $content = str_replace( ']]>', ']]&gt;', $content );
+    echo $content;
 }
 
 /**
  * Stub for __.
  */
-function __()
+function __($label, $context)
 {
-    wpStub('__', func_get_args());
+    return $label;
 }
 
 /**
@@ -606,7 +645,7 @@ function wp_footer()
  */
 function get_permalink()
 {
-    return wpStub('get_permalink', func_get_args());
+    wpStub('get_permalink', func_get_args());
 }
 
 /**
@@ -614,7 +653,7 @@ function get_permalink()
  */
 function get_comments_number()
 {
-    return wpStub('get_comments_number', func_get_args());
+    wpStub('get_comments_number', func_get_args());
 }
 
 /**
@@ -622,7 +661,7 @@ function get_comments_number()
  */
 function comments_popup_link()
 {
-    return wpStub('comments_popup_link', func_get_args());
+    wpStub('comments_popup_link', func_get_args());
 }
 
 /**
@@ -630,5 +669,332 @@ function comments_popup_link()
  */
 function get_the_title()
 {
-    return wpStub('get_the_title', func_get_args());
+    global $record;
+
+    return $record->title();
+}
+
+/**
+ * Stub for get_the_content.
+ */
+function get_the_content()
+{
+    global $record;
+
+    if (isset($record['body'])) {
+        return $record['body'];
+    } else {
+        return $record->excerpt(10000);
+    }
+}
+
+/**
+ * Stub for get_the_ID.
+ */
+function get_the_ID()
+{
+    global $record;
+
+    if (isset($record['id'])) {
+        return $record['id'];
+    } else {
+        return false;
+    }
+}
+
+
+/**
+ * Retrieve the classes for the post div as an array.
+ *
+ * The class names are many. If the post is a sticky, then the 'sticky'
+ * class name. The class 'hentry' is always added to each post. If the post has a
+ * post thumbnail, 'has-post-thumbnail' is added as a class. For each taxonomy that
+ * the post belongs to, a class will be added of the format '{$taxonomy}-{$slug}' -
+ * eg 'category-foo' or 'my_custom_taxonomy-bar'. The 'post_tag' taxonomy is a special
+ * case; the class has the 'tag-' prefix instead of 'post_tag-'. All classes are
+ * passed through the filter, 'post_class' with the list of classes, followed by
+ * $class parameter value, with the post ID as the last parameter.
+ *
+ * @since 2.7.0
+ * @since 4.2.0 Custom taxonomy classes were added.
+ *
+ * @param string|array $class   One or more classes to add to the class list.
+ * @param int|WP_Post  $post_id Optional. Post ID or post object.
+ * @return array Array of classes.
+ */
+function get_post_class( $class = '', $post_id = null ) {
+    $post = get_post( $post_id );
+
+    $classes = array();
+
+    if ( $class ) {
+        if ( ! is_array( $class ) ) {
+            $class = preg_split( '#\s+#', $class );
+        }
+        $classes = array_map( 'esc_attr', $class );
+    }
+
+    if ( ! $post ) {
+        return $classes;
+    }
+
+    $classes[] = 'post-' . $post->ID;
+    if ( ! is_admin() )
+        $classes[] = $post->post_type;
+    $classes[] = 'type-' . $post->post_type;
+    $classes[] = 'status-' . $post->post_status;
+
+    // Post Format
+    if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
+        $post_format = get_post_format( $post->ID );
+
+        if ( $post_format && !is_wp_error($post_format) )
+            $classes[] = 'format-' . sanitize_html_class( $post_format );
+        else
+            $classes[] = 'format-standard';
+    }
+
+    // Post requires password
+    if ( post_password_required( $post->ID ) ) {
+        $classes[] = 'post-password-required';
+    // Post thumbnails
+    } elseif ( ! is_attachment( $post ) && current_theme_supports( 'post-thumbnails' ) && has_post_thumbnail( $post->ID ) ) {
+        $classes[] = 'has-post-thumbnail';
+    }
+
+    // sticky for Sticky Posts
+    if ( is_sticky( $post->ID ) ) {
+        if ( is_home() && ! is_paged() ) {
+            $classes[] = 'sticky';
+        } elseif ( is_admin() ) {
+            $classes[] = 'status-sticky';
+        }
+    }
+
+    // hentry for hAtom compliance
+    $classes[] = 'hentry';
+
+    // All public taxonomies
+    $taxonomies = get_taxonomies( array( 'public' => true ) );
+    foreach ( (array) $taxonomies as $taxonomy ) {
+        if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
+            foreach ( (array) get_the_terms( $post->ID, $taxonomy ) as $term ) {
+                if ( empty( $term->slug ) ) {
+                    continue;
+                }
+
+                $term_class = sanitize_html_class( $term->slug, $term->term_id );
+                if ( is_numeric( $term_class ) || ! trim( $term_class, '-' ) ) {
+                    $term_class = $term->term_id;
+                }
+
+                // 'post_tag' uses the 'tag' prefix for backward compatibility.
+                if ( 'post_tag' == $taxonomy ) {
+                    $classes[] = 'tag-' . $term_class;
+                } else {
+                    $classes[] = sanitize_html_class( $taxonomy . '-' . $term_class, $taxonomy . '-' . $term->term_id );
+                }
+            }
+        }
+    }
+
+    $classes = array_map( 'esc_attr', $classes );
+
+    /**
+     * Filter the list of CSS classes for the current post.
+     *
+     * @since 2.7.0
+     *
+     * @param array  $classes An array of post classes.
+     * @param string $class   A comma-separated list of additional classes added to the post.
+     * @param int    $post_id The post ID.
+     */
+    $classes = apply_filters( 'post_class', $classes, $class, $post->ID );
+
+    return array_unique( $classes );
+}
+
+/**
+ * Stub for get_post.
+ */
+function get_post()
+{
+    global $record;
+
+    return $record;
+}
+
+/**
+ * Stub for post_type_supports.
+ */
+function post_type_supports()
+{
+    wpStub('post_type_supports', func_get_args());
+}
+
+/**
+ * Stub for get_taxonomies.
+ */
+function get_taxonomies()
+{
+    wpStub('get_taxonomies', func_get_args());
+}
+
+/**
+ * Escaping for HTML attributes.
+ *
+ * @since 2.8.0
+ *
+ * @param string $text
+ * @return string
+ */
+function esc_attr( $text ) {
+    $safe_text = wp_check_invalid_utf8( $text );
+    $safe_text = _wp_specialchars( $safe_text, ENT_QUOTES );
+    /**
+     * Filter a string cleaned and escaped for output in an HTML attribute.
+     *
+     * Text passed to esc_attr() is stripped of invalid or special characters
+     * before output.
+     *
+     * @since 2.0.6
+     *
+     * @param string $safe_text The text after it has been escaped.
+     * @param string $text      The text prior to being escaped.
+     */
+    return apply_filters( 'attribute_escape', $safe_text, $text );
+}
+
+
+/**
+ * Checks for invalid UTF8 in a string.
+ *
+ * @since 2.8.0
+ *
+ * @staticvar bool $is_utf8
+ * @staticvar bool $utf8_pcre
+ *
+ * @param string  $string The text which is to be checked.
+ * @param bool    $strip Optional. Whether to attempt to strip out invalid UTF8. Default is false.
+ * @return string The checked text.
+ */
+function wp_check_invalid_utf8( $string, $strip = false ) {
+    $string = (string) $string;
+
+    if ( 0 === strlen( $string ) ) {
+        return '';
+    }
+
+    // Store the site charset as a static to avoid multiple calls to get_option()
+    static $is_utf8 = null;
+    if ( ! isset( $is_utf8 ) ) {
+        $is_utf8 = in_array( get_option( 'blog_charset' ), array( 'utf8', 'utf-8', 'UTF8', 'UTF-8' ) );
+    }
+    if ( ! $is_utf8 ) {
+        return $string;
+    }
+
+    // Check for support for utf8 in the installed PCRE library once and store the result in a static
+    static $utf8_pcre = null;
+    if ( ! isset( $utf8_pcre ) ) {
+        $utf8_pcre = @preg_match( '/^./u', 'a' );
+    }
+    // We can't demand utf8 in the PCRE installation, so just return the string in those cases
+    if ( !$utf8_pcre ) {
+        return $string;
+    }
+
+    // preg_match fails when it encounters invalid UTF8 in $string
+    if ( 1 === @preg_match( '/^./us', $string ) ) {
+        return $string;
+    }
+
+    // Attempt to strip the bad chars if requested (not recommended)
+    if ( $strip && function_exists( 'iconv' ) ) {
+        return iconv( 'utf-8', 'utf-8', $string );
+    }
+
+    return '';
+}
+
+/**
+ * Converts a number of special characters into their HTML entities.
+ *
+ * Specifically deals with: &, <, >, ", and '.
+ *
+ * $quote_style can be set to ENT_COMPAT to encode " to
+ * &quot;, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are encoded.
+ *
+ * @since 1.2.2
+ * @access private
+ *
+ * @staticvar string $_charset
+ *
+ * @param string $string         The text which is to be encoded.
+ * @param int    $quote_style    Optional. Converts double quotes if set to ENT_COMPAT, both single and double if set to ENT_QUOTES or none if set to ENT_NOQUOTES. Also compatible with old values; converting single quotes if set to 'single', double if set to 'double' or both if otherwise set. Default is ENT_NOQUOTES.
+ * @param string $charset        Optional. The character encoding of the string. Default is false.
+ * @param bool   $double_encode  Optional. Whether to encode existing html entities. Default is false.
+ * @return string The encoded text with HTML entities.
+ */
+function _wp_specialchars( $string, $quote_style = ENT_NOQUOTES, $charset = false, $double_encode = false ) {
+    $string = (string) $string;
+
+    if ( 0 === strlen( $string ) )
+        return '';
+
+    // Don't bother if there are no specialchars - saves some processing
+    if ( ! preg_match( '/[&<>"\']/', $string ) )
+        return $string;
+
+    // Account for the previous behaviour of the function when the $quote_style is not an accepted value
+    if ( empty( $quote_style ) )
+        $quote_style = ENT_NOQUOTES;
+    elseif ( ! in_array( $quote_style, array( 0, 2, 3, 'single', 'double' ), true ) )
+        $quote_style = ENT_QUOTES;
+
+    // Store the site charset as a static to avoid multiple calls to wp_load_alloptions()
+    if ( ! $charset ) {
+        static $_charset = null;
+        if ( ! isset( $_charset ) ) {
+            $alloptions = wp_load_alloptions();
+            $_charset = isset( $alloptions['blog_charset'] ) ? $alloptions['blog_charset'] : '';
+        }
+        $charset = $_charset;
+    }
+
+    if ( in_array( $charset, array( 'utf8', 'utf-8', 'UTF8' ) ) )
+        $charset = 'UTF-8';
+
+    $_quote_style = $quote_style;
+
+    if ( $quote_style === 'double' ) {
+        $quote_style = ENT_COMPAT;
+        $_quote_style = ENT_COMPAT;
+    } elseif ( $quote_style === 'single' ) {
+        $quote_style = ENT_NOQUOTES;
+    }
+
+    if ( ! $double_encode ) {
+        // Guarantee every &entity; is valid, convert &garbage; into &amp;garbage;
+        // This is required for PHP < 5.4.0 because ENT_HTML401 flag is unavailable.
+        $string = wp_kses_normalize_entities( $string );
+    }
+
+    $string = @htmlspecialchars( $string, $quote_style, $charset, $double_encode );
+
+    // Backwards compatibility
+    if ( 'single' === $_quote_style )
+        $string = str_replace( "'", '&#039;', $string );
+
+    return $string;
+}
+
+
+
+/**
+ * Stub for get_option.
+ */
+function get_option()
+{
+    wpStub('get_option', func_get_args());
 }

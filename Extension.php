@@ -87,14 +87,27 @@ class Extension extends BaseExtension
         $GLOBALS['content'] = $content;
         $GLOBALS['record'] = $content;
 
+        return $this->render('single.php');
+
+    }
+
+    private function render($templatefile)
+    {
         ob_start();
 
-        require_once('single.php');
+        require_once($templatefile);
 
         $html = ob_get_clean();
 
+        $html = $this->lowercasePDangit($html);
+
         return $html;
 
+    }
+
+    private function lowercasePDangit($html)
+    {
+        return preg_replace('/WordPress/i', 'Wordpress', $html);
     }
 
 }

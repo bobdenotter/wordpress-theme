@@ -4,6 +4,7 @@ namespace Bolt\Extension\Bobdenotter\WPTheme;
 
 use Bolt\Application;
 use Bolt\BaseExtension;
+use Symfony\Component\HttpFoundation\Request;
 
 require_once(__DIR__ . '/wp_functions.php');
 
@@ -11,16 +12,17 @@ class Extension extends BaseExtension
 {
 
 
-    public function initialize() {
+    public function initialize()
+    {
+        $end = $this->app['config']->getWhichEnd();
 
-        chdir($this->app['paths']['themepath']);
+        if ($end =='frontend') {
 
-        // $GLOBALS['config'] = $this->app['config'];
-        // $GLOBALS['request'] = $this->app['request'];
-        $GLOBALS['paths'] = $this->app['paths'];
+            chdir($this->app['paths']['themepath']);
 
-        if (file_exists('functions.php')) {
-            require_once('functions.php');
+            $GLOBALS['config'] = $this->app['config'];
+            $GLOBALS['paths'] = $this->app['paths'];
+
         }
 
     }
@@ -30,8 +32,20 @@ class Extension extends BaseExtension
         return "WP Theme";
     }
 
-    public function before()
+    public function before(Request $request)
     {
+
+        $route = $request->get('_route');
+
+        if (substr($route, 0, 3) === 'wp-') {
+
+            if (file_exists('functions.php')) {
+                require_once('functions.php');
+            }
+
+            $GLOBALS['request'] = $request;
+        }
+
 
     }
 

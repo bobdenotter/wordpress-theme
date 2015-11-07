@@ -738,11 +738,11 @@ function get_post_class( $class = '', $post_id = null ) {
         return $classes;
     }
 
-    $classes[] = 'post-' . $post->ID;
+    $classes[] = 'post-' . $post->id;
     if ( ! is_admin() )
         $classes[] = $post->post_type;
-    $classes[] = 'type-' . $post->post_type;
-    $classes[] = 'status-' . $post->post_status;
+    $classes[] = 'type-' . $post->contenttype['singular_slug'];
+    $classes[] = 'status-' . $post->status;
 
     // Post Format
     if ( post_type_supports( $post->post_type, 'post-formats' ) ) {

@@ -1,6 +1,19 @@
 <?php
 
 
+function printParameters($parameters)
+{
+
+    $res = [];
+
+    foreach($parameters as $parameter) {
+        $res = sprintf("%s", (string) $parameters);
+    }
+
+    return implode(", ", $res);
+}
+
+
 function get_header()
 {
     require_once('header.php');
@@ -22,6 +35,38 @@ function the_post()
 
 }
 
+
+
+function the_title()
+{
+    global $record;
+    // dump($GLOBALS['content']);
+
+    // $GLOBALS['content'] = null;
+
+    return $record->title();
+
+}
+
+function the_content()
+{
+    return "[the_content";
+}
+
+function wp_link_pages()
+{
+    return "[wp_link_pages]";
+}
+
+function get_the_author_meta()
+{
+    return "[get_the_author_meta]";
+}
+
+function is_sticky()
+{
+    return "[is_sticky]";
+}
 
 function get_footer()
 {
@@ -269,17 +314,45 @@ function wp_footer()
 }
 
 
-function get_template_part()
+function get_template_part($slug)
 {
-    echo "[get_template_part]";
+    if (is_readable($slug . '.php')) {
+        return include($slug . '.php');
+    } else {
+        return "[get_template_part]";
+    }
 
 }
 
 
+function get_avatar()
+{
+    return "[get_avatar]";
+}
+
+function get_the_author()
+{
+    return "[get_the_author]";
+}
+
+function the_author_meta()
+{
+    return "[the_author_meta]";
+}
+
+function get_author_posts_url()
+{
+    return "[get_author_posts_url]";
+}
+
+function current_theme_supports()
+{
+    return "[current_theme_supports]";
+}
+
 function get_post_format()
 {
-    echo "[get_post_format]";
-
+    return "[get_post_format]";
 }
 
 function comments_open()
@@ -300,15 +373,15 @@ function the_post_navigation()
 
 }
 
-function h7()
+function the_ID()
 {
-    echo "[]";
+    echo "[the_ID]";
 
 }
 
-function h8()
+function post_class()
 {
-    echo "[]";
+    echo "[post_class]";
 
 }
 
@@ -317,3 +390,65 @@ function h9()
     echo "[]";
 
 }
+
+function get_template_directory()
+{
+    global $paths;
+    return $paths['themepath'];
+}
+
+function add_action()
+{
+    return "[add_action]";
+}
+
+
+function add_filter()
+{
+    return "[add_filter]";
+}
+
+
+function is_admin()
+{
+    return "[is_admin]";
+}
+
+function post_password_required()
+{
+    return false;
+}
+
+
+function is_attachment()
+{
+    return false;
+}
+
+function has_post_thumbnail()
+{
+    return false;
+}
+
+function is_single()
+{
+    return "[is_single]";
+}
+
+
+/**
+ * Stub for _x.
+ *
+ */
+function _x()
+{
+    // global $record;
+
+    $params = printParameters(func_get_args());
+
+    return "<mark>_x()<mark>";
+}
+
+
+
+

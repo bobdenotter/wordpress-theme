@@ -12,11 +12,16 @@ class Extension extends BaseExtension
 
 
     public function initialize() {
-        // $this->addCss('assets/extension.css');
-        // $this->addJavascript('assets/start.js', true);
 
         chdir($this->app['paths']['themepath']);
 
+        // $GLOBALS['config'] = $this->app['config'];
+        // $GLOBALS['request'] = $this->app['request'];
+        $GLOBALS['paths'] = $this->app['paths'];
+
+        if (file_exists('functions.php')) {
+            require_once('functions.php');
+        }
 
     }
 
@@ -25,14 +30,22 @@ class Extension extends BaseExtension
         return "WP Theme";
     }
 
+    public function before()
+    {
+
+    }
+
+    public function after()
+    {
+
+    }
 
     public function record($contenttypeslug, $slug = '') {
 
         // dump($this->app['config']->get('general/theme'));
 
-        $phpfile = $this->app['paths']['themepath'] . '/single.php';
+        // $phpfile = $this->app['paths']['themepath'] . '/single.php';
 
-//
         $contenttype = $this->app['storage']->getContentType($contenttypeslug);
 
         // If the contenttype is 'viewless', don't show the record page.
@@ -56,6 +69,8 @@ class Extension extends BaseExtension
         }
 
         $GLOBALS['content'] = $content;
+        $GLOBALS['record'] = $content;
+
         $GLOBALS['config'] = $this->app['config'];
         $GLOBALS['request'] = $this->app['request'];
         $GLOBALS['paths'] = $this->app['paths'];
@@ -71,6 +86,7 @@ class Extension extends BaseExtension
     }
 
 }
+
 
 
 

@@ -1,8 +1,8 @@
 Todo's: 
 
  - `add_action` needs to do something.
- - `is_sticky`
-
+ - ~~`is_sticky`~~
+ - Where does the thumbnail's width and height come from?
 
 
 -------

@@ -483,7 +483,9 @@ function post_class( $class = '', $post_id = null ) {
  */
 function has_post_thumbnail()
 {
-    wpStub('has_post_thumbnail', func_get_args());
+    global $record;
+
+    return (!empty($record->getImage()));
 }
 
 /**
@@ -491,16 +493,65 @@ function has_post_thumbnail()
  */
 function is_singular()
 {
-    wpStub('is_singular', func_get_args());
+    return is_single();
+}
+
+
+
+/**
+ * Stub for is_singular.
+ */
+function is_page()
+{
+    return is_single();
+}
+
+
+
+/**
+ * Display the post thumbnail.
+ *
+ * When a theme adds 'post-thumbnail' support, a special 'post-thumbnail' image size
+ * is registered, which differs from the 'thumbnail' image size managed via the
+ * Settings > Media screen.
+ *
+ * When using the_post_thumbnail() or related functions, the 'post-thumbnail' image
+ * size is used by default, though a different size can be specified instead as needed.
+ *
+ * @since 2.9.0
+ *
+ * @see get_the_post_thumbnail()
+ *
+ * @param string|array $size Optional. Registered image size to use, or flat array of height
+ *                           and width values. Default 'post-thumbnail'.
+ * @param string|array $attr Optional. Query string or array of attributes. Default empty.
+ */
+function the_post_thumbnail( $size = 'post-thumbnail', $attr = '' ) {
+    echo get_the_post_thumbnail( null, $size, $attr );
 }
 
 /**
- * Stub for the_post_thumbnail.
+ * <img width="825" height="510" src="http://wordpress.localhost/wp-content/uploads/2015/10/277688_hungry-like-the-wolf-825x510.jpg" class="attachment-post-thumbnail wp-post-image" alt="277688_hungry like the wolf">
  */
-function the_post_thumbnail()
+function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $attr = '' )
 {
-    wpStub('the_post_thumbnail', func_get_args());
+    global $safe_render, $record;
+
+    // Todo: Conjure the desired width and height from somewhere. Replace hardcoded values.
+    $width = 825;
+    $height = 510;
+
+    $data = [
+        'width' => $width,
+        'height' => $height,
+        'img' => $record->getImage()
+    ];
+
+    $res = $safe_render->render('<img src="{{ img|thumbnail(width, height) }}" width="{{width}}" height="{{height}}">', $data);
+
+    echo $res;
 }
+
 
 /**
  * Stub for is_single.
@@ -609,7 +660,7 @@ function is_sticky()
  */
 function current_theme_supports()
 {
-    wpStub('current_theme_supports', func_get_args());
+    return true;
 }
 
 /**
@@ -775,6 +826,8 @@ function get_the_ID()
  * @return array Array of classes.
  */
 function get_post_class( $class = '', $post_id = null ) {
+    global $record, $config;
+
     $post = get_post( $post_id );
 
     $classes = array();
@@ -826,27 +879,13 @@ function get_post_class( $class = '', $post_id = null ) {
     // hentry for hAtom compliance
     $classes[] = 'hentry';
 
+    $taxonomies = $config->get('taxonomy');
+
     // All public taxonomies
-    $taxonomies = get_taxonomies( array( 'public' => true ) );
-    foreach ( (array) $taxonomies as $taxonomy ) {
-        if ( is_object_in_taxonomy( $post->post_type, $taxonomy ) ) {
-            foreach ( (array) get_the_terms( $post->ID, $taxonomy ) as $term ) {
-                if ( empty( $term->slug ) ) {
-                    continue;
-                }
-
-                $term_class = sanitize_html_class( $term->slug, $term->term_id );
-                if ( is_numeric( $term_class ) || ! trim( $term_class, '-' ) ) {
-                    $term_class = $term->term_id;
-                }
-
-                // 'post_tag' uses the 'tag' prefix for backward compatibility.
-                if ( 'post_tag' == $taxonomy ) {
-                    $classes[] = 'tag-' . $term_class;
-                } else {
-                    $classes[] = sanitize_html_class( $taxonomy . '-' . $term_class, $taxonomy . '-' . $term->term_id );
-                }
-            }
+    foreach ( (array) $record->taxonomy as $taxonomy => $terms ) {
+        $slug = $taxonomies[$taxonomy]['singular_slug'];
+        foreach ($terms as $term) {
+            $classes[] = $slug . '-' . $term;
         }
     }
 
@@ -881,7 +920,7 @@ function get_post()
  */
 function post_type_supports()
 {
-    wpStub('post_type_supports', func_get_args());
+    return false;
 }
 
 /**
@@ -889,7 +928,17 @@ function post_type_supports()
  */
 function get_taxonomies()
 {
-    wpStub('get_taxonomies', func_get_args());
+    global $record;
+
+    $atoms = array();
+
+    if (!empty($record->taxonomy)) {
+        foreach($record->taxonomy as $taxonomies) {
+            $atoms = array_merge($atoms, $taxonomies);
+        }
+    }
+
+    return $atoms;
 }
 
 /**
@@ -1053,8 +1102,13 @@ function get_option($what)
             return 'text/html';
             break;
 
+        case 'blog_charset':
+            return 'UTF-8';
+            break;
+
         default:
             wpStub('get_option', func_get_args());
+            return false;
             break;
     }
 }
@@ -1069,4 +1123,20 @@ function get_locale()
     global $config;
 
     return($config->get('general/locale'));
+}
+
+/**
+ * Stub for the_permalink.
+ */
+function the_permalink()
+{
+    wpStub('the_permalink', func_get_args());
+}
+
+/**
+ * Stub for is_object_in_taxonomy.
+ */
+function is_object_in_taxonomy()
+{
+    wpStub('is_object_in_taxonomy', func_get_args());
 }

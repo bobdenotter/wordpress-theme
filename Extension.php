@@ -22,6 +22,7 @@ class Extension extends BaseExtension
 
             $GLOBALS['config'] = $this->app['config'];
             $GLOBALS['paths'] = $this->app['paths'];
+            $GLOBALS['currentuser'] = $this->app['users']->getCurrentUser();
 
         }
 
@@ -84,10 +85,6 @@ class Extension extends BaseExtension
 
         $GLOBALS['content'] = $content;
         $GLOBALS['record'] = $content;
-
-        $GLOBALS['config'] = $this->app['config'];
-        $GLOBALS['request'] = $this->app['request'];
-        $GLOBALS['paths'] = $this->app['paths'];
 
         ob_start();
 

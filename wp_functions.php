@@ -53,7 +53,9 @@ function have_posts()
 
 function the_post()
 {
-    dump($GLOBALS['content']);
+    global $record;
+
+    dump($record);
 
     $GLOBALS['content'] = null;
 
@@ -346,16 +348,64 @@ function add_filter()
  */
 function is_admin()
 {
-    wpStub('is_admin', func_get_args());
+    global $currentuser;
+
+    return (!empty($currentuser) && !empty($currentuser['username']));
 }
 
 /**
- * Stub for language_attributes.
+ * Displays the language attributes for the html tag.
+ *
+ * Builds up a set of html attributes containing the text direction and language
+ * information for the page.
+ *
+ * @since 2.1.0
+ * @since 4.3.0 Converted into a wrapper for get_language_attributes().
+ *
+ * @param string $doctype Optional. The type of html document. Accepts 'xhtml' or 'html'. Default 'html'.
  */
-function language_attributes()
-{
-    wpStub('language_attributes', func_get_args());
+function language_attributes( $doctype = 'html' ) {
+    echo get_language_attributes( $doctype );
 }
+
+/**
+ * Gets the language attributes for the html tag.
+ *
+ * Builds up a set of html attributes containing the text direction and language
+ * information for the page.
+ *
+ * @since 4.3.0
+ *
+ * @param string $doctype Optional. The type of html document. Accepts 'xhtml' or 'html'. Default 'html'.
+ */
+function get_language_attributes( $doctype = 'html' ) {
+    $attributes = array();
+
+    if ( function_exists( 'is_rtl' ) && is_rtl() )
+        $attributes[] = 'dir="rtl"';
+
+    if ( $lang = get_bloginfo('language') ) {
+        if ( get_option('html_type') == 'text/html' || $doctype == 'html' )
+            $attributes[] = "lang=\"$lang\"";
+
+        if ( get_option('html_type') != 'text/html' || $doctype == 'xhtml' )
+            $attributes[] = "xml:lang=\"$lang\"";
+    }
+
+    $output = implode(' ', $attributes);
+
+    /**
+     * Filter the language attributes for display in the html tag.
+     *
+     * @since 2.5.0
+     * @since 4.3.0 Added the `$doctype` parameter.
+     *
+     * @param string $output A space-separated list of language attributes.
+     * @param string $doctype The type of html document (xhtml|html).
+     */
+    return apply_filters( 'language_attributes', $output, $doctype );
+}
+
 
 /**
  * Stub for _e.
@@ -549,7 +599,9 @@ function get_author_posts_url()
  */
 function is_sticky()
 {
-    wpStub('is_sticky', func_get_args());
+    global $record;
+
+    return $record['sticky'];
 }
 
 /**
@@ -742,7 +794,7 @@ function get_post_class( $class = '', $post_id = null ) {
     if ( ! is_admin() )
         $classes[] = $post->post_type;
     $classes[] = 'type-' . $post->contenttype['singular_slug'];
-    $classes[] = 'status-' . $post->status;
+    $classes[] = 'status-' . $post['status'];
 
     // Post Format
     if ( post_type_supports( $post->post_type, 'post-formats' ) ) {
@@ -994,7 +1046,27 @@ function _wp_specialchars( $string, $quote_style = ENT_NOQUOTES, $charset = fals
 /**
  * Stub for get_option.
  */
-function get_option()
+function get_option($what)
 {
-    wpStub('get_option', func_get_args());
+    switch ($what) {
+        case 'html_type':
+            return 'text/html';
+            break;
+
+        default:
+            wpStub('get_option', func_get_args());
+            break;
+    }
+}
+
+
+
+/**
+ * Stub for get_locale.
+ */
+function get_locale()
+{
+    global $config;
+
+    return($config->get('general/locale'));
 }

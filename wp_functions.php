@@ -604,7 +604,7 @@ function the_content( $more_link_text = null, $strip_teaser = false) {
  */
 function wp_link_pages()
 {
-    wpStub('wp_link_pages', func_get_args());
+    // wpStub('wp_link_pages', func_get_args());
 }
 
 function get_the_author_meta( $field = '', $user_id = false )
@@ -686,17 +686,55 @@ function is_sticky()
 /**
  * Stub for current_theme_supports.
  */
-function current_theme_supports()
+function current_theme_supports( $feature )
 {
-    return true;
+    global $record;
+
+    if ( 'title-tag' == $feature ) {
+        // Don't confirm support unless called internally.
+        $trace = debug_backtrace();
+        if ( ! in_array( $trace[1]['function'], array( '_wp_render_title_tag', 'wp_title' ) ) ) {
+            return false;
+        }
+    }
+
+    // If no args passed then no extra checks need be performed
+    if ( func_num_args() <= 1 )
+        return true;
+
+    $args = array_slice( func_get_args(), 1 );
+
+    switch ( $feature ) {
+        case 'post-thumbnails':
+        case 'html5':
+            return true;
+
+        case 'post-formats':
+            return false;
+
+        case 'custom-header':
+        case 'custom-background' :
+            return false;
+
+        default:
+            return true; // #whatcouldgowrong?
+    }
 }
 
 /**
  * Stub for _x.
  */
-function _x()
+function _x( $text, $context, $domain = 'default' )
 {
-    wpStub('_x', func_get_args());
+    return __( $text, $domain );
+}
+
+/**
+ * Stub for _ex.
+ */
+function _ex( $text, $context, $domain = 'default' )
+{
+    echo __( $text, $domain );
 }
 
 /**
@@ -704,7 +742,9 @@ function _x()
  */
 function get_post_format_link()
 {
-    wpStub('get_post_format_link', func_get_args());
+    global $record;
+
+    return $record->link();
 }
 
 /**
@@ -720,7 +760,11 @@ function get_post_format_string()
  */
 function get_post_type()
 {
-    wpStub('get_post_type', func_get_args());
+    global $record;
+
+    return $record->contenttype['singular_slug'];
+
+    //wpStub('get_post_type', func_get_args());
 }
 
 /**
@@ -776,7 +820,9 @@ function wp_footer()
  */
 function get_permalink()
 {
-    wpStub('get_permalink', func_get_args());
+    global $record;
+
+    return $record->link();
 }
 
 /**
@@ -1167,4 +1213,52 @@ function the_permalink()
 function is_object_in_taxonomy()
 {
     wpStub('is_object_in_taxonomy', func_get_args());
+}
+
+/**
+ * Stub for get_the_time.
+ */
+function get_the_time()
+{
+    wpStub('get_the_time', func_get_args());
+}
+
+/**
+ * Stub for get_the_modified_time.
+ */
+function get_the_modified_time()
+{
+    wpStub('get_the_modified_time', func_get_args());
+}
+
+/**
+ * Stub for get_the_date.
+ */
+function get_the_date()
+{
+    wpStub('get_the_date', func_get_args());
+}
+
+/**
+ * Stub for get_the_modified_date.
+ */
+function get_the_modified_date()
+{
+    wpStub('get_the_modified_date', func_get_args());
+}
+
+/**
+ * Stub for get_the_category_list.
+ */
+function get_the_category_list()
+{
+    wpStub('get_the_category_list', func_get_args());
+}
+
+/**
+ * Stub for get_the_tag_list.
+ */
+function get_the_tag_list()
+{
+    wpStub('get_the_tag_list', func_get_args());
 }

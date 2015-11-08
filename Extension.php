@@ -7,6 +7,7 @@ use Bolt\BaseExtension;
 use Symfony\Component\HttpFoundation\Request;
 
 require_once(__DIR__ . '/wp_functions.php');
+require_once(__DIR__ . '/wp_helper.php');
 
 class Extension extends BaseExtension
 {

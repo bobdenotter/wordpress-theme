@@ -28,7 +28,7 @@ snippet for LowlevelExveption.php, around line 150:
  */
 function {$functionname}()
 {
-    wpStub('{$functionname}', func_get_args());
+    WPhelper::stub('{$functionname}', func_get_args());
 }
 
 EOM;
@@ -39,4 +39,5 @@ EOM;
 
             }
             // End of added for WP-theme extension.
+
 ```

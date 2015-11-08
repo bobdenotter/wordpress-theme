@@ -1,43 +1,5 @@
 <?php
 
-function wpPrintParameters($parameters = array())
-{
-    if (empty($parameters)) {
-        return;
-    }
-
-    $res = [];
-
-    foreach($parameters as $parameter) {
-
-        if (is_array($parameter)) {
-            $res[] = " [ " . wpPrintParameters($parameter) . " ] ";
-        } else {
-            $res[] = sprintf("<tt>&quot;%s&quot;</tt>", htmlspecialchars((string) $parameter));
-        }
-    }
-
-    return implode(", ", $res);
-}
-
-/**
- * Stub for edit_post_link.
- *
- */
-function wpStub($functionname, $arguments)
-{
-    global $markCssOutputted;
-    $arguments = wpPrintParameters($arguments);
-
-    if (!$markCssOutputted) {
-        echo "<style>mark { background-color: #fff9c0; text-decoration: none; border: 1px solid #DDB; padding: 1px 3px; display: inline-block; font-size: 13px; } </style>";
-        $markCssOutputted = true;
-    }
-
-    echo " <mark>{$functionname}({$arguments})</mark> ";
-}
-
-
 function get_header()
 {
     require_once('header.php');
@@ -324,7 +286,7 @@ function add_action()
 
     // @todo: Do something with this.
 
-    // wpStub('add_action', func_get_args());
+    // WPhelper::stub('add_action', func_get_args());
 }
 
 /**
@@ -332,7 +294,7 @@ function add_action()
  */
 function add_filter()
 {
-    // wpStub('add_filter', func_get_args());
+    // WPhelper::stub('add_filter', func_get_args());
 }
 
 
@@ -427,7 +389,7 @@ function __($label, $domain = 'default' )
  */
 function has_nav_menu()
 {
-    wpStub('has_nav_menu', func_get_args());
+    WPhelper::stub('has_nav_menu', func_get_args());
 }
 
 /**
@@ -435,7 +397,7 @@ function has_nav_menu()
  */
 function wp_nav_menu()
 {
-    wpStub('wp_nav_menu', func_get_args());
+    WPhelper::stub('wp_nav_menu', func_get_args());
 }
 
 /**
@@ -443,7 +405,7 @@ function wp_nav_menu()
  */
 function is_active_sidebar()
 {
-    wpStub('is_active_sidebar', func_get_args());
+    WPhelper::stub('is_active_sidebar', func_get_args());
 }
 
 /**
@@ -451,7 +413,7 @@ function is_active_sidebar()
  */
 function dynamic_sidebar()
 {
-    wpStub('dynamic_sidebar', func_get_args());
+    WPhelper::stub('dynamic_sidebar', func_get_args());
 }
 
 /**
@@ -460,7 +422,7 @@ function dynamic_sidebar()
 function get_post_format()
 {
     return false;
-    // wpStub('get_post_format', func_get_args());
+    // WPhelper::stub('get_post_format', func_get_args());
 }
 
 /**
@@ -602,7 +564,7 @@ function the_content( $more_link_text = null, $strip_teaser = false) {
  */
 function wp_link_pages()
 {
-    // wpStub('wp_link_pages', func_get_args());
+    // WPhelper::stub('wp_link_pages', func_get_args());
 }
 
 function get_the_author_meta( $field = '', $user_id = false )
@@ -613,26 +575,22 @@ function get_the_author_meta( $field = '', $user_id = false )
 
         case 'login':
             return $record->user['username'];
-            break;
 
         case 'email':
             return $record->user['email'];
-            break;
 
         case 'true':
             return $record->user['enabled'];
-            break;
 
         case 'description':
             return '-';
-            break;
 
         default:
             return false;
 
     }
 
-    // wpStub('get_the_author_meta', func_get_args());
+    // WPhelper::stub('get_the_author_meta', func_get_args());
 }
 
 /**
@@ -640,7 +598,7 @@ function get_the_author_meta( $field = '', $user_id = false )
  */
 function get_avatar()
 {
-    // wpStub('get_avatar', func_get_args());
+    // WPhelper::stub('get_avatar', func_get_args());
 }
 
 /**
@@ -750,7 +708,7 @@ function get_post_format_link()
  */
 function get_post_format_string()
 {
-    wpStub('get_post_format_string', func_get_args());
+    WPhelper::stub('get_post_format_string', func_get_args());
 }
 
 /**
@@ -762,7 +720,7 @@ function get_post_type()
 
     return $record->contenttype['singular_slug'];
 
-    //wpStub('get_post_type', func_get_args());
+    //WPhelper::stub('get_post_type', func_get_args());
 }
 
 /**
@@ -868,19 +826,57 @@ function comments_template( $file = '', $separate_comments = false ) {
 
 
 /**
- * Stub for the_post_navigation.
+ * Display navigation to next/previous post when applicable.
+ *
+ * @since 4.1.0
+ *
+ * @param array $args Optional. See {@see get_the_post_navigation()} for available
+ *                    arguments. Default empty array.
  */
-function the_post_navigation()
-{
-    wpStub('the_post_navigation', func_get_args());
+function the_post_navigation( $args = array() ) {
+    echo get_the_post_navigation( $args );
 }
+
+/**
+ * Return navigation to next/previous post when applicable.
+ *
+ * @since 4.1.0
+ *
+ * @param array $args {
+ *     Optional. Default post navigation arguments. Default empty array.
+ *
+ *     @type string $prev_text          Anchor text to display in the previous post link. Default `%title`.
+ *     @type string $next_text          Anchor text to display in the next post link. Default `%title`.
+ *     @type string $screen_reader_text Screen reader text for nav element. Default 'Post navigation'.
+ * }
+ * @return string Markup for post links.
+ */
+function get_the_post_navigation( $args = array() ) {
+    $args = wp_parse_args( $args, array(
+        'prev_text'          => '%title',
+        'next_text'          => '%title',
+        'screen_reader_text' => __( 'Post navigation' ),
+    ) );
+
+    $navigation = '';
+    $previous   = get_previous_post_link( '<div class="nav-previous">%link</div>', $args['prev_text'] );
+    $next       = get_next_post_link( '<div class="nav-next">%link</div>', $args['next_text'] );
+
+    // Only add markup if there's somewhere to navigate to.
+    if ( $previous || $next ) {
+        $navigation = _navigation_markup( $previous . $next, 'post-navigation', $args['screen_reader_text'] );
+    }
+
+    return $navigation;
+}
+
 
 /**
  * Stub for do_action.
  */
 function do_action()
 {
-    wpStub('do_action', func_get_args());
+    WPhelper::stub('do_action', func_get_args());
 }
 
 /**
@@ -888,7 +884,7 @@ function do_action()
  */
 function wp_footer()
 {
-    wpStub('wp_footer', func_get_args());
+    WPhelper::stub('wp_footer', func_get_args());
 }
 
 /**
@@ -906,7 +902,7 @@ function get_permalink()
  */
 function get_comments_number()
 {
-    wpStub('get_comments_number', func_get_args());
+    WPhelper::stub('get_comments_number', func_get_args());
 }
 
 /**
@@ -914,7 +910,7 @@ function get_comments_number()
  */
 function comments_popup_link()
 {
-    wpStub('comments_popup_link', func_get_args());
+    WPhelper::stub('comments_popup_link', func_get_args());
 }
 
 /**
@@ -1250,16 +1246,16 @@ function get_option($what)
     switch ($what) {
         case 'html_type':
             return 'text/html';
-            break;
 
         case 'blog_charset':
             return 'UTF-8';
-            break;
+
+        case 'date_format':
+            return '%A %B %e, %Y';
 
         default:
-            wpStub('get_option', func_get_args());
+            WPhelper::stub('get_option', func_get_args());
             return false;
-            break;
     }
 }
 
@@ -1280,7 +1276,7 @@ function get_locale()
  */
 function the_permalink()
 {
-    wpStub('the_permalink', func_get_args());
+    WPhelper::stub('the_permalink', func_get_args());
 }
 
 /**
@@ -1288,7 +1284,7 @@ function the_permalink()
  */
 function is_object_in_taxonomy()
 {
-    wpStub('is_object_in_taxonomy', func_get_args());
+    WPhelper::stub('is_object_in_taxonomy', func_get_args());
 }
 
 /**
@@ -1426,7 +1422,7 @@ function set_transient()
  */
 function wp_get_current_commenter()
 {
-    wpStub('wp_get_current_commenter', func_get_args());
+    WPhelper::stub('wp_get_current_commenter', func_get_args());
 }
 
 /**
@@ -1434,7 +1430,7 @@ function wp_get_current_commenter()
  */
 function get_comments()
 {
-    wpStub('get_comments', func_get_args());
+    WPhelper::stub('get_comments', func_get_args());
 }
 
 /**
@@ -1442,7 +1438,7 @@ function get_comments()
  */
 function get_query_var()
 {
-    wpStub('get_query_var', func_get_args());
+    WPhelper::stub('get_query_var', func_get_args());
 }
 
 /**
@@ -1450,7 +1446,7 @@ function get_query_var()
  */
 function have_comments()
 {
-    wpStub('have_comments', func_get_args());
+    WPhelper::stub('have_comments', func_get_args());
 }
 
 /**
@@ -1467,5 +1463,239 @@ function comment_form()
     $res = $app['twig']->render('wp_twighelpers/comment_form.twig', $data);
 
     echo $res;
+}
 
+
+/**
+ * Merge user defined arguments into defaults array.
+ *
+ * This function is used throughout WordPress to allow for both string or array
+ * to be merged into another array.
+ *
+ * @since 2.2.0
+ *
+ * @param string|array $args     Value to merge with $defaults
+ * @param array        $defaults Optional. Array that serves as the defaults. Default empty.
+ * @return array Merged user defined values with defaults.
+ */
+function wp_parse_args( $args, $defaults = '' ) {
+    if ( is_object( $args ) )
+        $r = get_object_vars( $args );
+    elseif ( is_array( $args ) )
+        $r =& $args;
+    else
+        wp_parse_str( $args, $r );
+
+    if ( is_array( $defaults ) )
+        return array_merge( $defaults, $r );
+    return $r;
+}
+
+
+
+/**
+ * Stub for get_previous_post_link.
+ */
+function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
+{
+    global $record;
+
+    if (empty($record)) {
+        return false;
+    }
+
+    $temp_rec = $record->previous();
+
+    if (empty($temp_rec)) {
+        return false;
+    }
+
+    if ( empty( $temp_rec->getTitle() ) ) {
+        $title = $previous ? __( 'Previous Post' ) : __( 'Next Post' );
+    }
+
+    /** This filter is documented in wp-includes/post-template.php */
+    $title = apply_filters( 'the_title', $title, $temp_rec['id'] );
+
+    $date = mysql2date( get_option( 'date_format' ), $temp_rec['datecreated'] );
+    $rel = $previous ? 'prev' : 'next';
+
+    $string = '<a href="' . $temp_rec->link() . '" rel="'.$rel.'">';
+    $inlink = str_replace( '%title', $title, $link );
+    $inlink = str_replace( '%date', $date, $inlink );
+    $inlink = $string . $inlink . '</a>';
+
+    $output = str_replace( '%link', $inlink, $format );
+
+    return apply_filters( "previous_post_link", $output, $format, $link, $post, $adjacent );
+
+}
+
+/**
+ * Stub for get_next_post_link.
+ */
+function get_next_post_link()
+{
+    global $record;
+
+    if (empty($record)) {
+        return false;
+    }
+
+    $temp_rec = $record->next();
+
+    if (empty($temp_rec)) {
+        return false;
+    }
+
+    if ( empty( $temp_rec->getTitle() ) ) {
+        $title = $previous ? __( 'Previous Post' ) : __( 'Next Post' );
+    }
+
+    /** This filter is documented in wp-includes/post-template.php */
+    $title = apply_filters( 'the_title', $title, $temp_rec['id'] );
+
+    $date = mysql2date( get_option( 'date_format' ), $temp_rec['datecreated'] );
+    $rel = $previous ? 'prev' : 'next';
+
+    $string = '<a href="' . $temp_rec->link() . '" rel="'.$rel.'">';
+    $inlink = str_replace( '%title', $title, $link );
+    $inlink = str_replace( '%date', $date, $inlink );
+    $inlink = $string . $inlink . '</a>';
+
+    $output = str_replace( '%link', $inlink, $format );
+
+    return apply_filters( "previous_post_link", $output, $format, $link, $post, $adjacent );
+}
+
+
+
+/**
+ * Convert given date string into a different format.
+ *
+ * $format should be either a PHP date format string, e.g. 'U' for a Unix
+ * timestamp, or 'G' for a Unix timestamp assuming that $date is GMT.
+ *
+ * If $translate is true then the given date and format string will
+ * be passed to date_i18n() for translation.
+ *
+ * @since 0.71
+ *
+ * @param string $format    Format of the date to return.
+ * @param string $date      Date string to convert.
+ * @param bool   $translate Whether the return date should be translated. Default true.
+ * @return string|int|bool Formatted date string or Unix timestamp. False if $date is empty.
+ */
+function mysql2date( $format, $date, $translate = true ) {
+    if ( empty( $date ) )
+        return false;
+
+    if ( 'G' == $format )
+        return strtotime( $date . ' +0000' );
+
+    $i = strtotime( $date );
+
+    if ( 'U' == $format )
+        return $i;
+
+    if ( $translate )
+        return date_i18n( $format, $i );
+    else
+        return date( $format, $i );
+}
+
+/**
+ * Stub for date_i18n.
+ */
+function date_i18n( $dateformatstring, $i )
+{
+    return strftime($format, $i);
+}
+
+
+/**
+ * Wraps passed links in navigational markup.
+ *
+ * @since 4.1.0
+ * @access private
+ *
+ * @param string $links              Navigational links.
+ * @param string $class              Optional. Custom class for nav element. Default: 'posts-navigation'.
+ * @param string $screen_reader_text Optional. Screen reader text for nav element. Default: 'Posts navigation'.
+ * @return string Navigation template tag.
+ */
+function _navigation_markup( $links, $class = 'posts-navigation', $screen_reader_text = '' ) {
+    if ( empty( $screen_reader_text ) ) {
+        $screen_reader_text = __( 'Posts navigation' );
+    }
+
+    $template = '
+    <nav class="navigation %1$s" role="navigation">
+        <h2 class="screen-reader-text">%2$s</h2>
+        <div class="nav-links">%3$s</div>
+    </nav>';
+
+    return sprintf( $template, sanitize_html_class( $class ), esc_html( $screen_reader_text ), $links );
+}
+
+/**
+ * Sanitizes an HTML classname to ensure it only contains valid characters.
+ *
+ * Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
+ * string then it will return the alternative value supplied.
+ *
+ * @todo Expand to support the full range of CDATA that a class attribute can contain.
+ *
+ * @since 2.8.0
+ *
+ * @param string $class    The classname to be sanitized
+ * @param string $fallback Optional. The value to return if the sanitization ends up as an empty string.
+ *  Defaults to an empty string.
+ * @return string The sanitized value
+ */
+function sanitize_html_class( $class, $fallback = '' ) {
+    //Strip out any % encoded octets
+    $sanitized = preg_replace( '|%[a-fA-F0-9][a-fA-F0-9]|', '', $class );
+
+    //Limit to A-Z,a-z,0-9,_,-
+    $sanitized = preg_replace( '/[^A-Za-z0-9_-]/', '', $sanitized );
+
+    if ( '' == $sanitized )
+        $sanitized = $fallback;
+
+    /**
+     * Filter a sanitized HTML class string.
+     *
+     * @since 2.8.0
+     *
+     * @param string $sanitized The sanitized HTML class.
+     * @param string $class     HTML class before sanitization.
+     * @param string $fallback  The fallback string.
+     */
+    return apply_filters( 'sanitize_html_class', $sanitized, $class, $fallback );
+}
+
+/**
+ * Escaping for HTML blocks.
+ *
+ * @since 2.8.0
+ *
+ * @param string $text
+ * @return string
+ */
+function esc_html( $text ) {
+    $safe_text = wp_check_invalid_utf8( $text );
+    $safe_text = _wp_specialchars( $safe_text, ENT_QUOTES );
+    /**
+     * Filter a string cleaned and escaped for output in HTML.
+     *
+     * Text passed to esc_html() is stripped of invalid or special characters
+     * before output.
+     *
+     * @since 2.8.0
+     *
+     * @param string $safe_text The text after it has been escaped.
+     * @param string $text      The text prior to being escaped.
+     */
+    return apply_filters( 'esc_html', $safe_text, $text );
 }

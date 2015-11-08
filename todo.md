@@ -32,12 +32,13 @@ function {$functionname}()
 }
 
 EOM;
-                $filename = dirname(dirname(__DIR__)) . '/extensions/local/bobdenotter/wp-theme/wp_functions.php';
+                $filename = dirname(dirname(__DIR__)) . '/extensions/local/bobdenotter/wp-theme/wp-functions.php';
                 if(file_put_contents($filename, $add, FILE_APPEND)) {
                     echo "<mark>Added $functionname !</mark>";
                 }
 
             }
             // End of added for WP-theme extension.
+
 
 ```

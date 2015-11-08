@@ -782,7 +782,7 @@ function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
         $text = __( 'Edit This' );
     }
 
-    $link = '<a class="post-edit-link" href="' . $url . '">' . $text . '</a>';
+    $link = '<a class="post-edit-link" href="' . $path . '">' . $text . '</a>';
 
     /**
      * Filter the post edit link anchor tag.

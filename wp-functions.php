@@ -1,11 +1,5 @@
 <?php
 
-function get_header()
-{
-    require_once('header.php');
-}
-
-
 function have_posts()
 {
     global $posts;
@@ -45,6 +39,47 @@ function the_title( $before = '', $after = '', $echo = true ) {
         echo $title;
     else
         return $title;
+}
+
+
+/**
+ * Load header template.
+ *
+ * Includes the header template for a theme or if a name is specified then a
+ * specialised header will be included.
+ *
+ * For the parameter, if the file is called "header-special.php" then specify
+ * "special".
+ *
+ * @since 1.5.0
+ *
+ * @param string $name The name of the specialised header.
+ */
+function get_header( $name = null ) {
+    /**
+     * Fires before the header template file is loaded.
+     *
+     * The hook allows a specific header template file to be used in place of the
+     * default header template file. If your file is called header-new.php,
+     * you would specify the filename in the hook as get_header( 'new' ).
+     *
+     * @since 2.1.0
+     * @since 2.8.0 $name parameter added.
+     *
+     * @param string $name Name of the specific header file to use.
+     */
+    do_action( 'get_header', $name );
+
+    $templates = array();
+    $name = (string) $name;
+    if ( '' !== $name )
+        $templates[] = "header-{$name}.php";
+
+    $templates[] = 'header.php';
+
+    // Backward compat code will be removed in a future release
+    if ('' == locate_template($templates, true))
+        load_template( ABSPATH . WPINC . '/theme-compat/header.php');
 }
 
 
@@ -258,10 +293,6 @@ function get_bloginfo($show = '', $filter = 'raw')
         return $output;
 }
 
-function apply_filters($filter, $output, $show = false)
-{
-    return $output;
-}
 
 function is_customize_preview()
 {
@@ -302,29 +333,6 @@ function is_attachment()
 {
     return false;
 }
-
-/**
- * Stub for add_action.
- */
-function add_action()
-{
-
-    // @todo: Do something with this.
-
-    // WPhelper::stub('add_action', func_get_args());
-}
-
-/**
- * Stub for add_filter.
- */
-function add_filter()
-{
-    // WPhelper::stub('add_filter', func_get_args());
-}
-
-
-// ------ Here be unconverted stubs. --------
-
 
 
 
@@ -921,14 +929,6 @@ function get_the_post_navigation( $args = array() ) {
     return $navigation;
 }
 
-
-/**
- * Stub for do_action.
- */
-function do_action()
-{
-    WPhelper::stub('do_action', func_get_args());
-}
 
 /**
  * Stub for wp_footer.
@@ -1889,40 +1889,6 @@ function the_posts_pagination( $args = array() ) {
 
 function get_the_posts_pagination( $args = array() )
 {
-    // global $app;
-
-    // $navigation = '';
-
-    // // Don't print empty markup if there's only one page.
-    // if ( is_paged() ) {
-    //     $args = wp_parse_args( $args, array(
-    //         'mid_size'           => 1,
-    //         'prev_text'          => _x( 'Previous', 'previous post' ),
-    //         'next_text'          => _x( 'Next', 'next post' ),
-    //         'screen_reader_text' => __( 'Posts navigation' ),
-    //     ) );
-
-    //     // Make sure we get a string back. Plain is the next best thing.
-    //     if ( isset( $args['type'] ) && 'array' == $args['type'] ) {
-    //         $args['type'] = 'plain';
-    //     }
-
-    //     dump($app['storage']->getPager());
-
-    //     // Set up paginated links.
-    //     // $links = paginate_links( $args );
-
-    //     if ( $links ) {
-    //         $navigation = _navigation_markup( $links, 'pagination', $args['screen_reader_text'] );
-    //     }
-    // }
-
-    // dump($navigation);
-
-    // return $navigation;
-
     return WPhelper::render('wp_twighelpers/pager.twig');
-
 }
-
 

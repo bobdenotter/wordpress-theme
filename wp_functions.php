@@ -49,10 +49,33 @@ function the_title( $before = '', $after = '', $echo = true ) {
 }
 
 
-function get_footer()
-{
-    require_once('footer.php');
+function get_footer( $name = null ) {
+    /**
+     * Fires before the footer template file is loaded.
+     *
+     * The hook allows a specific footer template file to be used in place of the
+     * default footer template file. If your file is called footer-new.php,
+     * you would specify the filename in the hook as get_footer( 'new' ).
+     *
+     * @since 2.1.0
+     * @since 2.8.0 $name parameter added.
+     *
+     * @param string $name Name of the specific footer file to use.
+     */
+    do_action( 'get_footer', $name );
+
+    $templates = array();
+    $name = (string) $name;
+    if ( '' !== $name )
+        $templates[] = "footer-{$name}.php";
+
+    $templates[] = 'footer.php';
+
+    // Backward compat code will be removed in a future release
+    if ('' == locate_template($templates, true))
+        load_template( ABSPATH . WPINC . '/theme-compat/footer.php');
 }
+
 
 function bloginfo()
 {
@@ -1701,4 +1724,66 @@ function esc_html( $text ) {
      * @param string $text      The text prior to being escaped.
      */
     return apply_filters( 'esc_html', $safe_text, $text );
+}
+
+/**
+ * Retrieve the name of the highest priority template file that exists.
+ *
+ * Searches in the STYLESHEETPATH before TEMPLATEPATH so that themes which
+ * inherit from a parent theme can just overload one file.
+ *
+ * @since 2.7.0
+ *
+ * @param string|array $template_names Template file(s) to search for, in order.
+ * @param bool         $load           If true the template file will be loaded if it is found.
+ * @param bool         $require_once   Whether to require_once or require. Default true. Has no effect if $load is false.
+ * @return string The template filename if one is located.
+ */
+function locate_template($template_names, $load = false, $require_once = true )
+{
+    global $paths;
+
+    dump($paths);
+
+    $located = '';
+    foreach ( (array) $template_names as $template_name ) {
+        if ( !$template_name )
+            continue;
+        if ( file_exists($paths['themepath'] . '/' . $template_name)) {
+            $located = $paths['themepath'] . '/' . $template_name;
+            break;
+        } elseif ( file_exists($paths['themepath'] . $template_name) ) {
+            $located = $paths['themepath'] . '/' . $template_name;
+            break;
+        } elseif ( file_exists($template_name) ) {
+            $located = $template_name;
+            break;
+        }
+    }
+
+    if ( $load && '' != $located )
+        load_template( $located, $require_once );
+
+    return $located;
+}
+
+
+/**
+ * Require the template file with WordPress environment.
+ *
+ * The globals are set up for the template file to ensure that the WordPress
+ * environment is available from within the function. The query variables are
+ * also available.
+ *
+ *
+ * @param string $_template_file Path to template file.
+ * @param bool   $require_once   Whether to require_once or require. Default true.
+ */
+function load_template( $_template_file, $require_once = true )
+{
+    if ( $require_once ) {
+        require_once( $_template_file );
+    } else {
+        require( $_template_file );
+    }
 }

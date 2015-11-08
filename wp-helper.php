@@ -104,6 +104,7 @@ class WPhelper {
     public function outputQueue()
     {
         if (!empty(self::$cssQueue)) {
+            dump(self::$cssQueue);
             echo implode('', self::$cssQueue);
         }
     }

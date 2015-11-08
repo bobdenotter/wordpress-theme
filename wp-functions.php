@@ -1915,6 +1915,17 @@ function get_the_posts_pagination( $args = array() )
 }
 
 
+
+
+/**
+ * Stub for wp_enqueue_script.
+ */
+function wp_enqueue_script( $handle, $src = false, $deps = array(), $ver = false, $in_footer = false )
+{
+    WPhelper::enqueueScript($handle, $src, $deps, $ver, $in_footer);
+}
+
+
 /**
  * Stub for wp_enqueue_style.
  */
@@ -2038,15 +2049,6 @@ function get_stylesheet_uri() {
 }
 
 
-
-/**
- * Stub for wp_enqueue_script.
- */
-function wp_enqueue_script()
-{
-    WPhelper::stub('wp_enqueue_script', func_get_args());
-}
-
 /**
  * Stub for wp_attachment_is_image.
  */
@@ -2075,9 +2077,9 @@ function get_adjacent_post()
 /**
  * Stub for get_theme_mod.
  */
-function get_theme_mod()
+function get_theme_mod( $name, $default = false )
 {
-    WPhelper::stub('get_theme_mod', func_get_args());
+    return $default;
 }
 
 

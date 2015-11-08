@@ -478,6 +478,10 @@ function has_post_thumbnail()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return (!empty($record->getImage()));
 }
 
@@ -529,6 +533,10 @@ function the_post_thumbnail( $size = 'post-thumbnail', $attr = '' ) {
 function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $attr = '' )
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     // Todo: Conjure the desired width and height from somewhere. Replace hardcoded values.
     $width = 825;
@@ -592,6 +600,10 @@ function get_the_author_meta( $field = '', $user_id = false )
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     switch($field) {
 
         case 'login':
@@ -629,6 +641,10 @@ function get_the_author()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record->user['displayname'];
 }
 
@@ -656,6 +672,10 @@ function get_author_posts_url()
 function is_sticky()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     return $record['sticky'];
 }
@@ -721,6 +741,10 @@ function get_post_format_link()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record->link();
 }
 
@@ -739,6 +763,10 @@ function get_post_type()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record->contenttype['singular_slug'];
 
     //WPhelper::stub('get_post_type', func_get_args());
@@ -751,7 +779,7 @@ function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
 {
     global $record, $currentuser;
 
-    if (empty($record) || empty($currentuser['username'])) {
+    if (!is_object($record) || empty($currentuser['username'])) {
         return;
     }
 
@@ -827,7 +855,7 @@ function comments_open()
 function comments_template( $file = '', $separate_comments = false ) {
     global $record, $paths;
 
-    if ( !(is_single() || is_page() || $withcomments) || empty($record) )
+    if ( !(is_single() || is_page() || $withcomments) || !is_object($record) )
         return;
 
     if ( empty($file) ) {
@@ -915,6 +943,10 @@ function get_permalink()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record->link();
 }
 
@@ -941,6 +973,10 @@ function get_the_title()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record->title();
 }
 
@@ -950,6 +986,10 @@ function get_the_title()
 function get_the_content()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     if (isset($record['body'])) {
         return $record['body'];
@@ -964,6 +1004,10 @@ function get_the_content()
 function get_the_ID()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     if (isset($record['id'])) {
         return $record['id'];
@@ -994,6 +1038,10 @@ function get_the_ID()
  */
 function get_post_class( $class = '', $post_id = null ) {
     global $record, $config;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     $post = get_post( $post_id );
 
@@ -1079,6 +1127,10 @@ function get_post()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return $record;
 }
 
@@ -1096,6 +1148,10 @@ function post_type_supports()
 function get_taxonomies()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     $atoms = array();
 
@@ -1315,6 +1371,10 @@ function get_the_time()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     $date = new DateTime($record['datecreated']);
 
     return $date->getTimestamp();
@@ -1326,6 +1386,10 @@ function get_the_time()
 function get_the_modified_time()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     $date = new DateTime($record['datechanged']);
 
@@ -1339,6 +1403,10 @@ function get_the_date()
 {
     global $record;
 
+    if (!is_object($record)) {
+        return;
+    }
+
     return strftime("%A %B %e, %Y", get_the_time());
 }
 
@@ -1348,6 +1416,10 @@ function get_the_date()
 function get_the_modified_date()
 {
     global $record;
+
+    if (!is_object($record)) {
+        return;
+    }
 
     return strftime("%A %B %e, %Y", get_the_modified_time());
 }
@@ -1359,8 +1431,8 @@ function get_the_category_list( $separator = '' )
 {
     global $record;
 
-    if (empty($record->taxonomy['categories'])) {
-        return '';
+    if (!is_object($record) || empty($record->taxonomy['categories'])) {
+        return;
     }
 
     $items = [];
@@ -1386,8 +1458,8 @@ function get_the_tag_list( $before = '', $sep = '', $after = '', $id = 0 )
 {
     global $record;
 
-    if (empty($record->taxonomy['tags'])) {
-        return '';
+    if (!is_object($record) || empty($record->taxonomy['tags'])) {
+        return;
     }
 
     $items = [];
@@ -1515,8 +1587,8 @@ function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
 {
     global $record;
 
-    if (empty($record)) {
-        return false;
+    if (!is_object($record)) {
+        return;
     }
 
     $temp_rec = $record->previous();
@@ -1554,8 +1626,8 @@ function get_next_post_link( $format = '&laquo; %link', $link = '%title' )
 {
     global $record;
 
-    if (empty($record)) {
-        return false;
+    if (!is_object($record)) {
+        return;
     }
 
     $temp_rec = $record->next();

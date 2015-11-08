@@ -54,13 +54,32 @@ class Extension extends BaseExtension
 
     }
 
+
+    public function homepage()
+    {
+        // Get the 'record' / 'records' for the homepage
+        $content = $this->app['storage']->getContent($this->app['config']->get('general/homepage'));
+
+        if (is_array($content)) {
+            $first = current($content);
+            $globals[$first->contenttype['slug']] = $content;
+        } elseif (!empty($content)) {
+            $globals['record'] = $content;
+            $globals[$content->contenttype['singular_slug']] = $content;
+        }
+
+        // We most likely also want a few 'posts'.
+        $posts = $this->app['storage']->getContent('posts/latest/6');
+
+        if (is_array($posts)) {
+            $globals['posts'] = $posts;
+        }
+
+        return $this->render('index.php', $globals);
+    }
+
     public function record($contenttypeslug, $slug = '')
     {
-
-        // dump($this->app['config']->get('general/theme'));
-
-        // $phpfile = $this->app['paths']['themepath'] . '/single.php';
-
         $contenttype = $this->app['storage']->getContentType($contenttypeslug);
 
         // If the contenttype is 'viewless', don't show the record page.
@@ -83,20 +102,26 @@ class Extension extends BaseExtension
             $content = $this->app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
         }
 
-        $GLOBALS['content'] = $content;
-        $GLOBALS['record'] = $content;
-        $GLOBALS['currentuser'] = $this->app['users']->getCurrentUser();
+        $globals = [
+            'content' => $content,
+            'record' => $content
+        ];
 
-        return $this->render('single.php');
+        return $this->render('single.php', $globals);
 
     }
 
-    private function render($templatefile)
+    private function render($templatefile, $globals = [])
     {
+        $globals['app'] = $this->app;
+        $globals['currentuser'] = $this->app['users']->getCurrentUser();
+
+        foreach($globals as $key =>$value) {
+            $GLOBALS[$key] = $value;
+        }
+
         ob_start();
-
         require_once($templatefile);
-
         $html = ob_get_clean();
 
         $html = $this->lowercasePDangit($html);

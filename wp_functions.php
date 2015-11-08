@@ -963,9 +963,21 @@ function get_comments_number()
 /**
  * Stub for comments_popup_link.
  */
-function comments_popup_link()
+function comments_popup_link($text = '')
 {
-    WPhelper::stub('comments_popup_link', func_get_args());
+    global $record;
+
+    if (!is_object($record) || !comments_open()) {
+        return;
+    }
+
+    if (empty($text)) {
+        $text = __("Leave a comment");
+    }
+
+    $link = sprintf('<a href="%s">%s</a>', $record->link(), $text);
+
+    echo $link;
 }
 
 /**
@@ -1870,10 +1882,47 @@ function is_multi_author()
     return false;
 }
 
-/**
- * Stub for the_posts_pagination.
- */
-function the_posts_pagination()
-{
-    echo WPhelper::render('wp_twighelpers/pager.twig');
+function the_posts_pagination( $args = array() ) {
+    echo get_the_posts_pagination( $args );
 }
+
+
+function get_the_posts_pagination( $args = array() )
+{
+    // global $app;
+
+    // $navigation = '';
+
+    // // Don't print empty markup if there's only one page.
+    // if ( is_paged() ) {
+    //     $args = wp_parse_args( $args, array(
+    //         'mid_size'           => 1,
+    //         'prev_text'          => _x( 'Previous', 'previous post' ),
+    //         'next_text'          => _x( 'Next', 'next post' ),
+    //         'screen_reader_text' => __( 'Posts navigation' ),
+    //     ) );
+
+    //     // Make sure we get a string back. Plain is the next best thing.
+    //     if ( isset( $args['type'] ) && 'array' == $args['type'] ) {
+    //         $args['type'] = 'plain';
+    //     }
+
+    //     dump($app['storage']->getPager());
+
+    //     // Set up paginated links.
+    //     // $links = paginate_links( $args );
+
+    //     if ( $links ) {
+    //         $navigation = _navigation_markup( $links, 'pagination', $args['screen_reader_text'] );
+    //     }
+    // }
+
+    // dump($navigation);
+
+    // return $navigation;
+
+    return WPhelper::render('wp_twighelpers/pager.twig');
+
+}
+
+

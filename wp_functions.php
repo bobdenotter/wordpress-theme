@@ -16,9 +16,9 @@ function have_posts()
 
 function the_post()
 {
-    global $posts, $record;
+    global $posts, $post;
 
-    $record = array_pop($posts);
+    $post = array_pop($posts);
 
 }
 
@@ -478,13 +478,13 @@ function post_class( $class = '', $post_id = null ) {
  */
 function has_post_thumbnail()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return (!empty($record->getImage()));
+    return (!empty($post->getImage()));
 }
 
 /**
@@ -534,9 +534,9 @@ function the_post_thumbnail( $size = 'post-thumbnail', $attr = '' ) {
  */
 function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $attr = '' )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
@@ -547,7 +547,7 @@ function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $att
     $data = [
         'width' => $width,
         'height' => $height,
-        'img' => $record->getImage()
+        'img' => $post->getImage()
     ];
 
     echo WPhelper::render('wp_twighelpers/post_thumbnail.twig', $data);
@@ -600,22 +600,22 @@ function wp_link_pages()
 
 function get_the_author_meta( $field = '', $user_id = false )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
     switch($field) {
 
         case 'login':
-            return $record->user['username'];
+            return $post->user['username'];
 
         case 'email':
-            return $record->user['email'];
+            return $post->user['email'];
 
         case 'true':
-            return $record->user['enabled'];
+            return $post->user['enabled'];
 
         case 'description':
             return '-';
@@ -641,13 +641,13 @@ function get_avatar()
  */
 function get_the_author()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record->user['displayname'];
+    return $post->user['displayname'];
 }
 
 /**
@@ -673,13 +673,13 @@ function get_author_posts_url()
  */
 function is_sticky()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record['sticky'];
+    return $post['sticky'];
 }
 
 /**
@@ -687,7 +687,7 @@ function is_sticky()
  */
 function current_theme_supports( $feature )
 {
-    global $record;
+    global $post;
 
     if ( 'title-tag' == $feature ) {
         // Don't confirm support unless called internally.
@@ -741,13 +741,13 @@ function _ex( $text, $context, $domain = 'default' )
  */
 function get_post_format_link()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record->link();
+    return $post->link();
 }
 
 /**
@@ -763,13 +763,13 @@ function get_post_format_string()
  */
 function get_post_type()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record->contenttype['singular_slug'];
+    return $post->contenttype['singular_slug'];
 
     //WPhelper::stub('get_post_type', func_get_args());
 }
@@ -779,13 +779,13 @@ function get_post_type()
  */
 function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
 {
-    global $record, $currentuser;
+    global $post, $currentuser;
 
-    if (!is_object($record) || empty($currentuser['username'])) {
+    if (!is_object($post) || empty($currentuser['username'])) {
         return;
     }
 
-    $path = \Bolt\Library::path('editcontent', ['contenttypeslug' => $record->contenttype['slug'], 'id' => $record['id']]);
+    $path = \Bolt\Library::path('editcontent', ['contenttypeslug' => $post->contenttype['slug'], 'id' => $post['id']]);
 
     if ( null === $text ) {
         $text = __( 'Edit This' );
@@ -802,7 +802,7 @@ function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
      * @param int    $post_id Post ID.
      * @param string $text    Anchor text.
      */
-    echo $before . apply_filters( 'edit_post_link', $link, $record['id'], $text ) . $after;
+    echo $before . apply_filters( 'edit_post_link', $link, $post['id'], $text ) . $after;
 
 }
 
@@ -855,9 +855,9 @@ function comments_open()
  *                                  Default false.
  */
 function comments_template( $file = '', $separate_comments = false ) {
-    global $record, $paths;
+    global $post, $paths;
 
-    if ( !(is_single() || is_page() || $withcomments) || !is_object($record) )
+    if ( !(is_single() || is_page() || $withcomments) || !is_object($post) )
         return;
 
     if ( empty($file) ) {
@@ -943,13 +943,13 @@ function wp_footer()
  */
 function get_permalink()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record->link();
+    return $post->link();
 }
 
 /**
@@ -965,9 +965,9 @@ function get_comments_number()
  */
 function comments_popup_link($text = '')
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record) || !comments_open()) {
+    if (!is_object($post) || !comments_open()) {
         return;
     }
 
@@ -975,7 +975,7 @@ function comments_popup_link($text = '')
         $text = __("Leave a comment");
     }
 
-    $link = sprintf('<a href="%s">%s</a>', $record->link(), $text);
+    $link = sprintf('<a href="%s">%s</a>', $post->link(), $text);
 
     echo $link;
 }
@@ -985,13 +985,13 @@ function comments_popup_link($text = '')
  */
 function get_the_title()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record->title();
+    return $post->title();
 }
 
 /**
@@ -999,16 +999,16 @@ function get_the_title()
  */
 function get_the_content()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    if (isset($record['body'])) {
-        return $record['body'];
+    if (isset($post['body'])) {
+        return $post['body'];
     } else {
-        return $record->excerpt(10000);
+        return $post->excerpt(10000);
     }
 }
 
@@ -1017,14 +1017,14 @@ function get_the_content()
  */
 function get_the_ID()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    if (isset($record['id'])) {
-        return $record['id'];
+    if (isset($post['id'])) {
+        return $post['id'];
     } else {
         return false;
     }
@@ -1051,9 +1051,9 @@ function get_the_ID()
  * @return array Array of classes.
  */
 function get_post_class( $class = '', $post_id = null ) {
-    global $record, $config;
+    global $post, $config;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
@@ -1111,7 +1111,7 @@ function get_post_class( $class = '', $post_id = null ) {
     $taxonomies = $config->get('taxonomy');
 
     // All public taxonomies
-    foreach ( (array) $record->taxonomy as $taxonomy => $terms ) {
+    foreach ( (array) $post->taxonomy as $taxonomy => $terms ) {
         $slug = $taxonomies[$taxonomy]['singular_slug'];
         foreach ($terms as $term) {
             $classes[] = $slug . '-' . $term;
@@ -1139,13 +1139,13 @@ function get_post_class( $class = '', $post_id = null ) {
  */
 function get_post()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    return $record;
+    return $post;
 }
 
 /**
@@ -1161,16 +1161,16 @@ function post_type_supports()
  */
 function get_taxonomies()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
     $atoms = array();
 
-    if (!empty($record->taxonomy)) {
-        foreach($record->taxonomy as $taxonomies) {
+    if (!empty($post->taxonomy)) {
+        foreach($post->taxonomy as $taxonomies) {
             $atoms = array_merge($atoms, $taxonomies);
         }
     }
@@ -1383,13 +1383,13 @@ function is_object_in_taxonomy()
  */
 function get_the_time()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    $date = new DateTime($record['datecreated']);
+    $date = new DateTime($post['datecreated']);
 
     return $date->getTimestamp();
 }
@@ -1399,13 +1399,13 @@ function get_the_time()
  */
 function get_the_modified_time()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    $date = new DateTime($record['datechanged']);
+    $date = new DateTime($post['datechanged']);
 
     return $date->getTimestamp();
 }
@@ -1415,9 +1415,9 @@ function get_the_modified_time()
  */
 function get_the_date()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
@@ -1429,9 +1429,9 @@ function get_the_date()
  */
 function get_the_modified_date()
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
@@ -1443,15 +1443,15 @@ function get_the_modified_date()
  */
 function get_the_category_list( $separator = '' )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record) || empty($record->taxonomy['categories'])) {
+    if (!is_object($post) || empty($post->taxonomy['categories'])) {
         return;
     }
 
     $items = [];
 
-    foreach($record->taxonomy['categories'] as $link => $term) {
+    foreach($post->taxonomy['categories'] as $link => $term) {
         $items[] = sprintf('<a href="%s">%s</a>', $link, $term);
     }
 
@@ -1470,15 +1470,15 @@ function get_the_category_list( $separator = '' )
  */
 function get_the_tag_list( $before = '', $sep = '', $after = '', $id = 0 )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record) || empty($record->taxonomy['tags'])) {
+    if (!is_object($post) || empty($post->taxonomy['tags'])) {
         return;
     }
 
     $items = [];
 
-    foreach($record->taxonomy['tags'] as $link => $term) {
+    foreach($post->taxonomy['tags'] as $link => $term) {
         $items[] = sprintf('<a href="%s">%s</a>', $link, $term);
     }
 
@@ -1599,13 +1599,13 @@ function wp_parse_args( $args, $defaults = '' ) {
  */
 function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    $temp_rec = $record->previous();
+    $temp_rec = $post->previous();
 
     if (empty($temp_rec)) {
         return false;
@@ -1638,13 +1638,13 @@ function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
  */
 function get_next_post_link( $format = '&laquo; %link', $link = '%title' )
 {
-    global $record;
+    global $post;
 
-    if (!is_object($record)) {
+    if (!is_object($post)) {
         return;
     }
 
-    $temp_rec = $record->next();
+    $temp_rec = $post->next();
 
     if (empty($temp_rec)) {
         return false;

@@ -65,7 +65,7 @@ class Extension extends BaseExtension
             $first = current($content);
             $globals[$first->contenttype['slug']] = $content;
         } elseif (!empty($content)) {
-            $globals['record'] = $content;
+            $globals['post'] = $content;
             $globals[$content->contenttype['singular_slug']] = $content;
         }
 
@@ -96,16 +96,16 @@ class Extension extends BaseExtension
         $slug = $this->app['slugify']->slugify($slug);
 
         // First, try to get it by slug.
-        $content = $this->app['storage']->getContent($contenttype['slug'], array('slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)));
+        $post = $this->app['storage']->getContent($contenttype['slug'], array('slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)));
 
-        if (!$content && is_numeric($slug)) {
+        if (!$post && is_numeric($slug)) {
             // And otherwise try getting it by ID
-            $content = $this->app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
+            $post = $this->app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
         }
 
         $globals = [
-            'content' => $content,
-            'record' => $content
+            'posts' => [ $post ],
+            'post' => $post
         ];
 
         return $this->render('single.php', $globals);

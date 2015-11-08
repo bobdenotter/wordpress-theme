@@ -23,8 +23,6 @@ class Extension extends BaseExtension
 
             $GLOBALS['config'] = $this->app['config'];
             $GLOBALS['paths'] = $this->app['paths'];
-            $GLOBALS['safe_render'] = $this->app['safe_render'];
-
         }
 
     }
@@ -56,7 +54,8 @@ class Extension extends BaseExtension
 
     }
 
-    public function record($contenttypeslug, $slug = '') {
+    public function record($contenttypeslug, $slug = '')
+    {
 
         // dump($this->app['config']->get('general/theme'));
 

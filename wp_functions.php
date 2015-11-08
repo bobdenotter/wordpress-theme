@@ -528,7 +528,7 @@ function the_post_thumbnail( $size = 'post-thumbnail', $attr = '' ) {
  */
 function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $attr = '' )
 {
-    global $safe_render, $record;
+    global $record;
 
     // Todo: Conjure the desired width and height from somewhere. Replace hardcoded values.
     $width = 825;
@@ -540,9 +540,7 @@ function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $att
         'img' => $record->getImage()
     ];
 
-    $res = $safe_render->render('<img src="{{ img|thumbnail(width, height) }}" width="{{width}}" height="{{height}}">', $data);
-
-    echo $res;
+    echo WPhelper::render('wp_twighelpers/post_thumbnail.twig', $data);
 }
 
 
@@ -1477,15 +1475,9 @@ function have_comments()
  */
 function comment_form()
 {
-    global $app;
-
-    $app['twig.loader.filesystem']->addPath(__DIR__);
-
     $data = [];
 
-    $res = $app['twig']->render('wp_twighelpers/comment_form.twig', $data);
-
-    echo $res;
+    echo WPhelper::render('wp_twighelpers/comment_form.twig', $data);
 }
 
 
@@ -1742,8 +1734,6 @@ function esc_html( $text ) {
 function locate_template($template_names, $load = false, $require_once = true )
 {
     global $paths;
-
-    dump($paths);
 
     $located = '';
     foreach ( (array) $template_names as $template_name ) {

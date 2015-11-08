@@ -1,5 +1,7 @@
 <?php
 
+use Bolt\Configuration\ResourceManager;
+
 class WPhelper {
 
     var $markCssOutputted;
@@ -42,5 +44,14 @@ class WPhelper {
         return implode(", ", $res);
     }
 
+
+    public function render($template, $data = [])
+    {
+        $app = ResourceManager::getApp();
+
+        $app['twig.loader.filesystem']->addPath(__DIR__);
+
+        return $app['twig']->render($template, $data);
+    }
 
 }

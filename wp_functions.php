@@ -55,7 +55,7 @@ function the_post()
 {
     global $record;
 
-    dump($record->values);
+    // dump($record->values);
 
     $GLOBALS['content'] = null;
 
@@ -124,8 +124,6 @@ function body_class()
 function is_front_page()
 {
     global $request;
-
-    // dump($request->get('_route'));
 
     if ($request->get('_route') == 'wp-homepage') {
         return true;
@@ -804,16 +802,70 @@ function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
  */
 function comments_open()
 {
-    wpStub('comments_open', func_get_args());
+    global $app;
+
+    $enabled = array_keys($app['extensions']->getEnabled());
+    $needed = ['Disqus', 'Facebook Comments'];
+
+    return (!empty(array_intersect($needed, $enabled)));
 }
 
+
 /**
- * Stub for comments_template.
+ * Load the comment template specified in $file.
+ *
+ * Will not display the comments template if not on single post or page, or if
+ * the post does not have comments.
+ *
+ * Uses the WordPress database object to query for the comments. The comments
+ * are passed through the 'comments_array' filter hook with the list of comments
+ * and the post ID respectively.
+ *
+ * The $file path is passed through a filter hook called, 'comments_template'
+ * which includes the TEMPLATEPATH and $file combined. Tries the $filtered path
+ * first and if it fails it will require the default comment template from the
+ * default theme. If either does not exist, then the WordPress process will be
+ * halted. It is advised for that reason, that the default theme is not deleted.
+ *
+ * @uses $withcomments Will not try to get the comments if the post has none.
+ *
+ * @since 1.5.0
+ *
+ * @global WP_Query $wp_query
+ * @global WP_Post  $post
+ * @global wpdb     $wpdb
+ * @global int      $id
+ * @global object   $comment
+ * @global string   $user_login
+ * @global int      $user_ID
+ * @global string   $user_identity
+ * @global bool     $overridden_cpage
+ *
+ * @param string $file              Optional. The file to load. Default '/comments.php'.
+ * @param bool   $separate_comments Optional. Whether to separate the comments by comment type.
+ *                                  Default false.
  */
-function comments_template()
-{
-    wpStub('comments_template', func_get_args());
+function comments_template( $file = '', $separate_comments = false ) {
+    global $record, $paths;
+
+    if ( !(is_single() || is_page() || $withcomments) || empty($record) )
+        return;
+
+    if ( empty($file) ) {
+        $file = $paths['themepath'] . '/comments.php';
+    }
+
+    $comments = [];
+
+    if (file_exists($file)) {
+        require($file);
+    } elseif (file_exists($paths['themepath'] . '/' . $file)) {
+        require($paths['themepath'] . '/' . $file);
+    } elseif (file_exists($paths['themepath'] . $file)) {
+        require($paths['themepath'] . $file);
+    }
 }
+
 
 /**
  * Stub for the_post_navigation.
@@ -1367,4 +1419,53 @@ function get_categories()
 function set_transient()
 {
     return true;
+}
+
+/**
+ * Stub for wp_get_current_commenter.
+ */
+function wp_get_current_commenter()
+{
+    wpStub('wp_get_current_commenter', func_get_args());
+}
+
+/**
+ * Stub for get_comments.
+ */
+function get_comments()
+{
+    wpStub('get_comments', func_get_args());
+}
+
+/**
+ * Stub for get_query_var.
+ */
+function get_query_var()
+{
+    wpStub('get_query_var', func_get_args());
+}
+
+/**
+ * Stub for have_comments.
+ */
+function have_comments()
+{
+    wpStub('have_comments', func_get_args());
+}
+
+/**
+ * Stub for comment_form.
+ */
+function comment_form()
+{
+    global $app;
+
+    $app['twig.loader.filesystem']->addPath(__DIR__);
+
+    $data = [];
+
+    $res = $app['twig']->render('wp_twighelpers/comment_form.twig', $data);
+
+    echo $res;
+
 }

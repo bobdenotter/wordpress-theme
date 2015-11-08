@@ -1510,8 +1510,10 @@ function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
         return false;
     }
 
-    if ( empty( $temp_rec->getTitle() ) ) {
-        $title = $previous ? __( 'Previous Post' ) : __( 'Next Post' );
+    if ($temp_rec->title()) {
+        $title = $temp_rec->title();
+    } else {
+        $title = __( 'Previous Post' );
     }
 
     /** This filter is documented in wp-includes/post-template.php */
@@ -1528,13 +1530,12 @@ function get_previous_post_link( $format = '&laquo; %link', $link = '%title' )
     $output = str_replace( '%link', $inlink, $format );
 
     return apply_filters( "previous_post_link", $output, $format, $link, $post, $adjacent );
-
 }
 
 /**
  * Stub for get_next_post_link.
  */
-function get_next_post_link()
+function get_next_post_link( $format = '&laquo; %link', $link = '%title' )
 {
     global $record;
 
@@ -1548,8 +1549,10 @@ function get_next_post_link()
         return false;
     }
 
-    if ( empty( $temp_rec->getTitle() ) ) {
-        $title = $previous ? __( 'Previous Post' ) : __( 'Next Post' );
+    if ($temp_rec->title()) {
+        $title = $temp_rec->title();
+    } else {
+        $title = __( 'Next Post' );
     }
 
     /** This filter is documented in wp-includes/post-template.php */
@@ -1565,7 +1568,7 @@ function get_next_post_link()
 
     $output = str_replace( '%link', $inlink, $format );
 
-    return apply_filters( "previous_post_link", $output, $format, $link, $post, $adjacent );
+    return apply_filters( "next_post_link", $output, $format, $link, $post, $adjacent );
 }
 
 

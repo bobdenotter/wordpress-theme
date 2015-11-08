@@ -410,10 +410,19 @@ function get_language_attributes( $doctype = 'html' ) {
 /**
  * Stub for _e.
  */
-function _e()
+function _e($label, $domain = 'default' )
 {
-    wpStub('_e', func_get_args());
+    echo __($label, $domain);
 }
+
+/**
+ * Stub for __.
+ */
+function __($label, $domain = 'default' )
+{
+    return $label;
+}
+
 
 /**
  * Stub for has_nav_menu.
@@ -452,7 +461,8 @@ function dynamic_sidebar()
  */
 function get_post_format()
 {
-    wpStub('get_post_format', func_get_args());
+    return false;
+    // wpStub('get_post_format', func_get_args());
 }
 
 /**
@@ -590,14 +600,6 @@ function the_content( $more_link_text = null, $strip_teaser = false) {
 }
 
 /**
- * Stub for __.
- */
-function __($label, $context)
-{
-    return $label;
-}
-
-/**
  * Stub for wp_link_pages.
  */
 function wp_link_pages()
@@ -605,12 +607,34 @@ function wp_link_pages()
     wpStub('wp_link_pages', func_get_args());
 }
 
-/**
- * Stub for get_the_author_meta.
- */
-function get_the_author_meta()
+function get_the_author_meta( $field = '', $user_id = false )
 {
-    wpStub('get_the_author_meta', func_get_args());
+    global $record;
+
+    switch($field) {
+
+        case 'login':
+            return $record->user['username'];
+            break;
+
+        case 'email':
+            return $record->user['email'];
+            break;
+
+        case 'true':
+            return $record->user['enabled'];
+            break;
+
+        case 'description':
+            return '-';
+            break;
+
+        default:
+            return false;
+
+    }
+
+    // wpStub('get_the_author_meta', func_get_args());
 }
 
 /**
@@ -618,7 +642,7 @@ function get_the_author_meta()
  */
 function get_avatar()
 {
-    wpStub('get_avatar', func_get_args());
+    // wpStub('get_avatar', func_get_args());
 }
 
 /**
@@ -626,15 +650,17 @@ function get_avatar()
  */
 function get_the_author()
 {
-    wpStub('get_the_author', func_get_args());
+    global $record;
+
+    return $record->user['displayname'];
 }
 
 /**
  * Stub for the_author_meta.
  */
-function the_author_meta()
+function the_author_meta( $field = '', $user_id = false )
 {
-    wpStub('the_author_meta', func_get_args());
+    echo get_the_author_meta( $field, $user_id );
 }
 
 /**
@@ -642,7 +668,9 @@ function the_author_meta()
  */
 function get_author_posts_url()
 {
-    wpStub('get_author_posts_url', func_get_args());
+    // @todo: Make a nice link
+
+    return "/";
 }
 
 /**

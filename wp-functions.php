@@ -125,13 +125,35 @@ function esc_url($str)
 
 function get_template_directory_uri()
 {
-    echo "[get_template_directory_uri]";
+    global $paths;
+    return $paths['theme'];
+}
+
+/**
+ * Stub for get_stylesheet_directory_uri.
+ */
+function get_stylesheet_directory_uri()
+{
+    global $paths;
+    return $paths['theme'];
 }
 
 
-function wp_head()
-{
-    require_once('wp_head.php');
+/**
+ * Fire the wp_head action
+ *
+ * @since 1.2.0
+ */
+function wp_head() {
+    /**
+     * Print scripts or data in the head tag on the front end.
+     *
+     * @since 1.5.0
+     */
+
+    do_action( 'wp_head' );
+
+    // require_once('wp_head.php');
 }
 
 function body_class()
@@ -1890,5 +1912,97 @@ function the_posts_pagination( $args = array() ) {
 function get_the_posts_pagination( $args = array() )
 {
     return WPhelper::render('wp_twighelpers/pager.twig');
+}
+
+
+/**
+ * Stub for wp_enqueue_style.
+ */
+function wp_enqueue_style( $handle, $src = false, $deps = array(), $ver = false, $media = 'all' )
+{
+    WPhelper::enqueueStyleSheet( $handle, $src, $deps, $ver, $media );
+}
+
+
+/**
+ * Stub for wp_style_add_data.
+ */
+function wp_style_add_data($handle, $key, $value)
+{
+    WPhelper::addStyleData($handle, $key, $value);
+}
+
+/**
+ * Stub for wp_add_inline_style.
+ */
+function wp_add_inline_style($handle, $data)
+{
+    WPhelper::enqueueInlineStyle( $handle, $data );
+}
+
+
+/**
+ * Stub for add_query_arg.
+ */
+function add_query_arg()
+{
+    WPhelper::stub('add_query_arg', func_get_args());
+}
+
+function get_stylesheet_uri() {
+    $stylesheet_dir_uri = get_stylesheet_directory_uri();
+    $stylesheet_uri = $stylesheet_dir_uri . '/style.css';
+    /**
+     * Filter the URI of the current theme stylesheet.
+     *
+     * @since 1.5.0
+     *
+     * @param string $stylesheet_uri     Stylesheet URI for the current theme/child theme.
+     * @param string $stylesheet_dir_uri Stylesheet directory URI for the current theme/child theme.
+     */
+    return apply_filters( 'stylesheet_uri', $stylesheet_uri, $stylesheet_dir_uri );
+}
+
+
+
+/**
+ * Stub for wp_enqueue_script.
+ */
+function wp_enqueue_script()
+{
+    WPhelper::stub('wp_enqueue_script', func_get_args());
+}
+
+/**
+ * Stub for wp_attachment_is_image.
+ */
+function wp_attachment_is_image()
+{
+    WPhelper::stub('wp_attachment_is_image', func_get_args());
+}
+
+/**
+ * Stub for wp_localize_script.
+ */
+function wp_localize_script()
+{
+    WPhelper::stub('wp_localize_script', func_get_args());
+}
+
+/**
+ * Stub for get_adjacent_post.
+ */
+function get_adjacent_post()
+{
+    WPhelper::stub('get_adjacent_post', func_get_args());
+}
+
+
+/**
+ * Stub for get_theme_mod.
+ */
+function get_theme_mod()
+{
+    WPhelper::stub('get_theme_mod', func_get_args());
 }
 

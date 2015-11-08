@@ -124,6 +124,11 @@ class Extension extends BaseExtension
 
         ob_start();
         require_once($templatefile);
+
+        do_action( 'wp_enqueue_scripts' );
+
+        \WPhelper::outputQueue();
+
         $html = ob_get_clean();
 
         $html = $this->lowercasePDangit($html);

@@ -4,6 +4,7 @@ namespace Bolt\Extension\Bobdenotter\WPTheme;
 
 use Bolt\Application;
 use Bolt\BaseExtension;
+use Bolt\Pager;
 use Symfony\Component\HttpFoundation\Request;
 
 require_once(__DIR__ . '/wp_functions.php');
@@ -69,7 +70,7 @@ class Extension extends BaseExtension
         }
 
         // We most likely also want a few 'posts'.
-        $posts = $this->app['storage']->getContent('posts/latest/6');
+        $posts = $this->getPagedRecords('posts');
 
         if (is_array($posts)) {
             $globals['posts'] = $posts;
@@ -134,6 +135,48 @@ class Extension extends BaseExtension
     {
         return preg_replace('/WordPress/i', 'Wordpress', $html);
     }
+
+    private function getPagedRecords($contenttypeslug = 'posts')
+    {
+        $contenttype = $this->app['storage']->getContentType($contenttypeslug);
+
+        $pagerid = Pager::makeParameterId($contenttypeslug);
+        // First, get some content
+        $page = $this->app['request']->query->get($pagerid, $this->app['request']->query->get('page', 1));
+
+        // Theme value takes precedence over CT & default config
+        // @see https://github.com/bolt/bolt/issues/3951
+        if (!$amount = $this->app['config']->get('theme/listing_records', false)) {
+            $amount = empty($contenttype['listing_records']) ? $this->app['config']->get('general/listing_records') : $contenttype['listing_records'];
+        }
+        if (!$order = $this->app['config']->get('theme/listing_sort', false)) {
+            $order = empty($contenttype['sort']) ? null : $contenttype['sort'];
+        }
+        // If $order is not set, one of two things can happen: Either we let `getContent()` sort by itself, or we
+        // explicitly set it to sort on the general/listing_sort setting.
+        if ($order === null) {
+            $taxonomies = $this->app['config']->get('taxonomy');
+            $hassortorder = false;
+            if (!empty($contenttype['taxonomy'])) {
+                foreach ($contenttype['taxonomy'] as $contenttypetaxonomy) {
+                    if ($taxonomies[$contenttypetaxonomy]['has_sortorder']) {
+                        // We have a taxonomy with a sortorder, so we must keep $order = false, in order
+                        // to let `getContent()` handle it. We skip the fallback that's a few lines below.
+                        $hassortorder = true;
+                    }
+                }
+            }
+            if (!$hassortorder) {
+                $order = $this->app['config']->get('general/listing_sort');
+            }
+        }
+
+        $content = $this->app['storage']->getContent($contenttype['slug'], ['limit' => $amount, 'order' => $order, 'page' => $page, 'paging' => true]);
+
+        return $content;
+    }
+
+
 
 }
 

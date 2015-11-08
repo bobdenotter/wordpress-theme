@@ -8,18 +8,17 @@ function get_header()
 
 function have_posts()
 {
+    global $posts;
 
-    return (!empty($GLOBALS['content']));
+    return (!empty($posts));
 
 }
 
 function the_post()
 {
-    global $record;
+    global $posts, $record;
 
-    // dump($record->values);
-
-    $GLOBALS['content'] = null;
+    $record = array_pop($posts);
 
 }
 
@@ -110,16 +109,19 @@ function is_front_page()
 {
     global $request;
 
+    // Todo, make distinction between 'is_home' and 'is_front_page'. Derp.
+
     if ($request->get('_route') == 'wp-homepage') {
         return true;
     } else {
         return false;
     }
-
 }
 
 function is_home()
 {
+    // Todo, make distinction between 'is_home' and 'is_front_page'. Derp.
+
     return is_front_page();
 }
 
@@ -1848,4 +1850,30 @@ function load_template( $_template_file, $require_once = true )
     } else {
         require( $_template_file );
     }
+}
+
+/**
+ * Stub for is_paged.
+ */
+function is_paged()
+{
+    global $app;
+
+    return !$app['storage']->isEmptyPager();
+}
+
+/**
+ * Stub for is_multi_author.
+ */
+function is_multi_author()
+{
+    return false;
+}
+
+/**
+ * Stub for the_posts_pagination.
+ */
+function the_posts_pagination()
+{
+    echo WPhelper::render('wp_twighelpers/pager.twig');
 }

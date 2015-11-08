@@ -55,7 +55,7 @@ function the_post()
 {
     global $record;
 
-    dump($record);
+    dump($record->values);
 
     $GLOBALS['content'] = null;
 
@@ -101,7 +101,7 @@ function bloginfo()
 
 function esc_url($str)
 {
-    echo $str;
+    return $str;
 }
 
 function get_template_directory_uri()
@@ -770,9 +770,33 @@ function get_post_type()
 /**
  * Stub for edit_post_link.
  */
-function edit_post_link()
+function edit_post_link( $text = null, $before = '', $after = '', $id = 0 )
 {
-    wpStub('edit_post_link', func_get_args());
+    global $record, $currentuser;
+
+    if (empty($record) || empty($currentuser['username'])) {
+        return;
+    }
+
+    $path = \Bolt\Library::path('editcontent', ['contenttypeslug' => $record->contenttype['slug'], 'id' => $record['id']]);
+
+    if ( null === $text ) {
+        $text = __( 'Edit This' );
+    }
+
+    $link = '<a class="post-edit-link" href="' . $url . '">' . $text . '</a>';
+
+    /**
+     * Filter the post edit link anchor tag.
+     *
+     * @since 2.3.0
+     *
+     * @param string $link    Anchor tag for the edit link.
+     * @param int    $post_id Post ID.
+     * @param string $text    Anchor text.
+     */
+    echo $before . apply_filters( 'edit_post_link', $link, $record['id'], $text ) . $after;
+
 }
 
 /**
@@ -1220,7 +1244,11 @@ function is_object_in_taxonomy()
  */
 function get_the_time()
 {
-    wpStub('get_the_time', func_get_args());
+    global $record;
+
+    $date = new DateTime($record['datecreated']);
+
+    return $date->getTimestamp();
 }
 
 /**
@@ -1228,7 +1256,11 @@ function get_the_time()
  */
 function get_the_modified_time()
 {
-    wpStub('get_the_modified_time', func_get_args());
+    global $record;
+
+    $date = new DateTime($record['datechanged']);
+
+    return $date->getTimestamp();
 }
 
 /**
@@ -1236,7 +1268,9 @@ function get_the_modified_time()
  */
 function get_the_date()
 {
-    wpStub('get_the_date', func_get_args());
+    global $record;
+
+    return strftime("%A %B %e, %Y", get_the_time());
 }
 
 /**
@@ -1244,21 +1278,93 @@ function get_the_date()
  */
 function get_the_modified_date()
 {
-    wpStub('get_the_modified_date', func_get_args());
+    global $record;
+
+    return strftime("%A %B %e, %Y", get_the_modified_time());
 }
 
 /**
  * Stub for get_the_category_list.
  */
-function get_the_category_list()
+function get_the_category_list( $separator = '' )
 {
-    wpStub('get_the_category_list', func_get_args());
+    global $record;
+
+    if (empty($record->taxonomy['categories'])) {
+        return '';
+    }
+
+    $items = [];
+
+    foreach($record->taxonomy['categories'] as $link => $term) {
+        $items[] = sprintf('<a href="%s">%s</a>', $link, $term);
+    }
+
+    if ($separator != '') {
+        $res = implode($separator, $items);
+    } else {
+        $res = "<ul><li>" . implode("</li><li>", $items) . "</li></ul>";
+    }
+
+    return $res;
+
 }
 
 /**
  * Stub for get_the_tag_list.
  */
-function get_the_tag_list()
+function get_the_tag_list( $before = '', $sep = '', $after = '', $id = 0 )
 {
-    wpStub('get_the_tag_list', func_get_args());
+    global $record;
+
+    if (empty($record->taxonomy['tags'])) {
+        return '';
+    }
+
+    $items = [];
+
+    foreach($record->taxonomy['tags'] as $link => $term) {
+        $items[] = sprintf('<a href="%s">%s</a>', $link, $term);
+    }
+
+    if ($sep != '') {
+        $res = implode($sep, $items);
+    } else {
+        $res = "<ul><li>" . implode("</li><li>", $items) . "</li></ul>";
+    }
+
+    return $before . $res . $after;
+
+}
+
+/**
+ * Stub for get_transient.
+ */
+function get_transient()
+{
+    return false;
+}
+
+/**
+ * Stub for get_categories.
+ */
+function get_categories()
+{
+    global $config;
+
+    if (!empty($config->get('taxonomy/categories'))) {
+        $categories = $config->get('taxonomy/categories');
+        return($categories['options']);
+    } else {
+        return false;
+    }
+
+}
+
+/**
+ * Stub for set_transient.
+ */
+function set_transient()
+{
+    return true;
 }

@@ -1349,6 +1349,8 @@ function _wp_specialchars( $string, $quote_style = ENT_NOQUOTES, $charset = fals
  */
 function get_option($what)
 {
+    global $app;
+
     switch ($what) {
         case 'html_type':
             return 'text/html';
@@ -1358,6 +1360,10 @@ function get_option($what)
 
         case 'date_format':
             return '%A %B %e, %Y';
+
+        case 'blogname':
+            return $app['config']->get('general/sitename');
+
 
         default:
             WPhelper::stub('get_option', func_get_args());
@@ -1552,7 +1558,7 @@ function wp_get_current_commenter()
  */
 function get_comments()
 {
-    WPhelper::stub('get_comments', func_get_args());
+    return '';
 }
 
 /**
@@ -1568,7 +1574,7 @@ function get_query_var()
  */
 function have_comments()
 {
-    WPhelper::stub('have_comments', func_get_args());
+    return false;
 }
 
 /**
@@ -2293,4 +2299,108 @@ function previous_post_link()
 function next_post_link()
 {
     WPhelper::stub('next_post_link', func_get_args());
+}
+
+/**
+ * Stub for wp_get_theme.
+ */
+function wp_get_theme()
+{
+    WPhelper::stub('wp_get_theme', func_get_args());
+}
+
+/**
+ * Stub for get_header_image.
+ */
+function get_header_image()
+{
+    WPhelper::stub('get_header_image', func_get_args());
+}
+
+/**
+ * Stub for esc_html_e.
+ */
+function esc_html_e()
+{
+    WPhelper::stub('esc_html_e', func_get_args());
+}
+
+/**
+ * Stub for wp_load_alloptions.
+ */
+function wp_load_alloptions()
+{
+    WPhelper::stub('wp_load_alloptions', func_get_args());
+}
+
+/**
+ * Stub for is_child_theme.
+ */
+function is_child_theme()
+{
+    WPhelper::stub('is_child_theme', func_get_args());
+}
+
+/**
+ * Stub for is_rtl.
+ */
+function is_rtl()
+{
+    WPhelper::stub('is_rtl', func_get_args());
+}
+
+/**
+ * Stub for get_post_meta.
+ */
+function get_post_meta()
+{
+    WPhelper::stub('get_post_meta', func_get_args());
+}
+
+/**
+ * Stub for the_title_attribute.
+ */
+function the_title_attribute()
+{
+    WPhelper::stub('the_title_attribute', func_get_args());
+}
+
+/**
+ * Stub for _nx.
+ */
+function _nx()
+{
+    WPhelper::stub('_nx', func_get_args());
+}
+
+/**
+ * Stub for number_format_i18n.
+ */
+function number_format_i18n()
+{
+    WPhelper::stub('number_format_i18n', func_get_args());
+}
+
+/**
+ * Stub for get_comment_pages_count.
+ */
+function get_comment_pages_count()
+{
+    WPhelper::stub('get_comment_pages_count', func_get_args());
+}
+
+/**
+ * Stub for wp_list_comments.
+ */
+function wp_list_comments()
+{
+    WPhelper::stub('wp_list_comments', func_get_args());
+}
+
+/**
+ * Stub for wp_allowed_protocols.
+ */
+function wp_allowed_protocols()
+{
+    WPhelper::stub('wp_allowed_protocols', func_get_args());
 }

@@ -60,6 +60,7 @@ class Extension extends BaseExtension
     {
         require_once(__DIR__ . '/wp-functions.php');
         require_once(__DIR__ . '/wp-plugin.php');
+        require_once(__DIR__ . '/wp-includes/kses.php');
         require_once(__DIR__ . '/wp-includes/widgets.php');
         require_once(__DIR__ . '/wp-includes/class-wp-customize-control.php');
 
@@ -216,11 +217,12 @@ class Extension extends BaseExtension
 
         do_action('customize_register', $customize);
 
-        // dump($wp_filter);
         // $customize->dumpSettings();
         $data['output'] = $customize->getYaml();
 
-        $data['text'] = "The following configuration file was generated automatically from the <tt>twentyfifteen</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
+        $data['text'] = "The following configuration file was generated automatically from the <tt>" .
+            $this->app['config']->get('general/theme') .
+            "</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
         // dump($data);
 
         $this->app['twig.loader.filesystem']->addPath(__DIR__);

@@ -42,11 +42,24 @@ class WPcustomize {
         return new \stdClass();
     }
 
+
+    public function get_control()
+    {
+        return new \stdClass();
+    }
+
+
+    public function add_section($id, $args = array())
+    {
+        $this->sections[$id] = $args;
+    }
+
     public function dumpSettings()
     {
 
-        dump($this->settings);
         dump($this->controls);
+        dump($this->settings);
+        dump($this->sections);
 
     }
 
@@ -58,13 +71,28 @@ class WPcustomize {
         foreach($this->controls as $id => $control) {
 
             if ($control->section != $lastsection) {
-                $output .= sprintf("\n# ---- SECTION %s ------ \n", strtoupper($control->section));
+
+                if (isset($this->sections[$control->section]) && !empty($this->sections[$control->section]['title'])) {
+                    $section = $this->sections[$control->section]['title'];
+                } else {
+                    $section = $control->section;
+                }
+
+                $output .= sprintf("\n# ---- SECTION %s ---- \n", strtoupper($section));
+
+                if (isset($this->sections[$control->section]) && !empty($this->sections[$control->section]['description'])) {
+                    $output .= sprintf("# ---- %s ---- \n", $this->sections[$control->section]['description']);
+                }
+
                 $lastsection = $control->section;
             }
 
-            $output .= sprintf("\n# %s \n", $control->label);
+            $output .= "\n";
+            if (!empty($control->label)) {
+                $output .= sprintf("# %s \n", $control->label);
+            }
             if (!empty($control->description)) {
-                $output .= sprintf("# %s \n", $control->description);
+                $output .= sprintf("# %s \n", strip_tags($control->description));
             }
 
             if (!empty($control->choices) && is_array($control->choices)) {

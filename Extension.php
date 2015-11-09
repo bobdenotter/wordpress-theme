@@ -8,7 +8,6 @@ use Bolt\Pager;
 use Symfony\Component\HttpFoundation\Request;
 use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
 
-
 require_once(__DIR__ . '/src/WPhelper.php');
 
 class Extension extends BaseExtension
@@ -61,6 +60,8 @@ class Extension extends BaseExtension
     {
         require_once(__DIR__ . '/wp-functions.php');
         require_once(__DIR__ . '/wp-plugin.php');
+        require_once(__DIR__ . '/wp-includes/widgets.php');
+        require_once(__DIR__ . '/wp-includes/class-wp-customize-control.php');
 
         chdir($this->app['paths']['themepath']);
 
@@ -142,7 +143,7 @@ class Extension extends BaseExtension
 
         require_once($templatefile);
 
-        do_action( 'wp_enqueue_scripts' );
+        do_action('wp_enqueue_scripts');
 
         $html = ob_get_clean();
 
@@ -211,7 +212,16 @@ class Extension extends BaseExtension
 
         $this->loadWPCruft();
 
-        dump($wp_filter);
+        $customize = new WPcustomize();
+
+        do_action('customize_register', $customize);
+
+        // dump($wp_filter);
+        // $customize->dumpSettings();
+        $data['output'] = $customize->getYaml();
+
+        $data['text'] = "The following configuration file was generated automatically from the <tt>twentyfifteen</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
+        // dump($data);
 
         $this->app['twig.loader.filesystem']->addPath(__DIR__);
 

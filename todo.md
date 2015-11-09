@@ -4,7 +4,9 @@ Todo's:
  - ~~`is_sticky`~~
  - Where does the thumbnail's width and height come from?
 
-
+ - "defaults" must be added to theme's config.yml. 
+ See 'vantage's settings.php
+    $defaults['logo_header_text'] = __('Call me! Maybe?', 'vantage');
 
 
 -------

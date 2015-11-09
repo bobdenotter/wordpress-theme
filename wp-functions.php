@@ -2417,11 +2417,34 @@ function wp_list_comments()
 }
 
 /**
- * Stub for wp_allowed_protocols.
+ * Retrieve a list of protocols to allow in HTML attributes.
+ *
+ * @since 3.3.0
+ * @since 4.3.0 Added 'webcal' to the protocols array.
+ *
+ * @see wp_kses()
+ * @see esc_url()
+ *
+ * @staticvar array $protocols
+ *
+ * @return array Array of allowed protocols. Defaults to an array containing 'http', 'https',
+ *               'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet',
+ *               'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', and 'webcal'.
  */
-function wp_allowed_protocols()
-{
-    WPhelper::stub('wp_allowed_protocols', func_get_args());
+function wp_allowed_protocols() {
+    static $protocols = array();
+
+    if ( empty( $protocols ) ) {
+        $protocols = array( 'http', 'https', 'ftp', 'ftps', 'mailto', 'news', 'irc', 'gopher', 'nntp', 'feed', 'telnet', 'mms', 'rtsp', 'svn', 'tel', 'fax', 'xmpp', 'webcal' );
+
+        /**
+         * Filter the list of protocols allowed in HTML attributes.
+         *
+         * @since 3.0.0
+         *
+         * @param array $protocols Array of allowed protocols e.g. 'http', 'ftp', 'tel', and more.
+         */
+        $protocols = apply_filters( 'kses_allowed_protocols', $protocols );
+    }
+    return $protocols;
 }
-
-

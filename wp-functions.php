@@ -582,7 +582,7 @@ function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $att
         'img' => $post->getImage()
     ];
 
-    echo WPhelper::render('wp_twighelpers/post_thumbnail.twig', $data);
+    echo WPhelper::render('wp-twighelpers/post_thumbnail.twig', $data);
 }
 
 
@@ -1587,7 +1587,7 @@ function comment_form()
 {
     $data = [];
 
-    echo WPhelper::render('wp_twighelpers/comment_form.twig', $data);
+    echo WPhelper::render('wp-twighelpers/comment_form.twig', $data);
 }
 
 
@@ -1913,7 +1913,7 @@ function the_posts_pagination( $args = array() ) {
 
 function get_the_posts_pagination( $args = array() )
 {
-    return WPhelper::render('wp_twighelpers/pager.twig');
+    return WPhelper::render('wp-twighelpers/pager.twig');
 }
 
 

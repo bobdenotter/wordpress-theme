@@ -20,12 +20,13 @@ class Extension extends BaseExtension
         $end = $this->app['config']->getWhichEnd();
 
         if ($end =='frontend') {
-
-            require_once(__DIR__ . '/wp-functions.php');
-            require_once(__DIR__ . '/wp-plugin.php');
-
-
+            $this->loadWPCruft();
         }
+
+        $root = $this->app['resources']->getUrl('bolt');
+        $this->addMenuOption('WP Theme', $root . 'wp-theme', 'fa:wordpress');
+        $this->app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
+        $this->app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
 
     }
 
@@ -54,6 +55,21 @@ class Extension extends BaseExtension
     public function after()
     {
 
+    }
+
+    public function loadWPCruft()
+    {
+        require_once(__DIR__ . '/wp-functions.php');
+        require_once(__DIR__ . '/wp-plugin.php');
+
+        chdir($this->app['paths']['themepath']);
+
+        $GLOBALS['config'] = $this->app['config'];
+        $GLOBALS['paths'] = $this->app['paths'];
+
+        if (file_exists('functions.php')) {
+            require_once('functions.php');
+        }
     }
 
 
@@ -122,11 +138,6 @@ class Extension extends BaseExtension
             $GLOBALS[$key] = $value;
         }
 
-            chdir($this->app['paths']['themepath']);
-
-            $GLOBALS['config'] = $this->app['config'];
-            $GLOBALS['paths'] = $this->app['paths'];
-
         ob_start();
 
         require_once($templatefile);
@@ -182,6 +193,31 @@ class Extension extends BaseExtension
     }
 
 
+    public function wpThemeDashboard(Request $request)
+    {
+        $data = [];
+
+        $this->app['twig.loader.filesystem']->addPath(__DIR__);
+
+        return $this->app['twig']->render('wp-theme-templates/dashboard.twig', $data);
+
+    }
+
+    public function wpThemeGatherSettings(Request $request)
+    {
+        global $wp_filter;
+
+        $data = [];
+
+        $this->loadWPCruft();
+
+        dump($wp_filter);
+
+        $this->app['twig.loader.filesystem']->addPath(__DIR__);
+
+        return $this->app['twig']->render('wp-theme-templates/dashboard.twig', $data);
+
+    }
 
 }
 

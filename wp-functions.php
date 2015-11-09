@@ -2448,3 +2448,59 @@ function wp_allowed_protocols() {
     }
     return $protocols;
 }
+
+/**
+ * Stub for get_file_data.
+ */
+function get_file_data()
+{
+    WPhelper::stub('get_file_data', func_get_args());
+}
+
+/**
+ * Stub for load_theme_textdomain.
+ */
+function load_theme_textdomain()
+{
+    WPhelper::stub('load_theme_textdomain', func_get_args());
+}
+
+/**
+ * Stub for add_theme_support.
+ */
+function add_theme_support()
+{
+    WPhelper::stub('add_theme_support', func_get_args());
+}
+
+/**
+ * Stub for register_nav_menus.
+ */
+function register_nav_menus()
+{
+    WPhelper::stub('register_nav_menus', func_get_args());
+}
+
+/**
+ * Stub for set_post_thumbnail_size.
+ */
+function set_post_thumbnail_size()
+{
+    WPhelper::stub('set_post_thumbnail_size', func_get_args());
+}
+
+/**
+ * Stub for add_image_size.
+ */
+function add_image_size()
+{
+    WPhelper::stub('add_image_size', func_get_args());
+}
+
+/**
+ * Stub for current_user_can.
+ */
+function current_user_can()
+{
+    WPhelper::stub('current_user_can', func_get_args());
+}

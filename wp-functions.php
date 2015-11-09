@@ -113,6 +113,7 @@ function get_footer( $name = null ) {
 }
 
 
+
 function bloginfo()
 {
     global $content, $config;
@@ -167,9 +168,22 @@ function wp_head() {
      */
 
     do_action( 'wp_head' );
-
-    // require_once('wp_head.php');
 }
+
+/**
+ * Fire the wp_footer action
+ *
+ * @since 1.5.1
+ */
+function wp_footer() {
+    /**
+     * Print scripts or data before the closing body tag on the front end.
+     *
+     * @since 1.5.1
+     */
+    do_action( 'wp_footer' );
+}
+
 
 function body_class()
 {
@@ -945,13 +959,6 @@ function get_the_post_navigation( $args = array() ) {
 }
 
 
-/**
- * Stub for wp_footer.
- */
-function wp_footer()
-{
-    WPhelper::stub('wp_footer', func_get_args());
-}
 
 /**
  * Stub for get_permalink.
@@ -2192,9 +2199,21 @@ function _http_build_query( $data, $prefix = null, $sep = null, $key = '', $urle
 /**
  * Stub for wp_title.
  */
-function wp_title()
+function wp_title( $sep = '&raquo;', $display = true, $seplocation = '' )
 {
-    WPhelper::stub('wp_title', func_get_args());
+    global $post;
+
+    $data = [
+        'post' => $post,
+    ];
+
+    $title = WPhelper::render('wp-twighelpers/title.twig', $data);
+
+    if ($display) {
+        echo $title;
+    } else {
+        return $title;
+    }
 }
 
 /**
@@ -2346,7 +2365,7 @@ function is_child_theme()
  */
 function is_rtl()
 {
-    WPhelper::stub('is_rtl', func_get_args());
+    return false;
 }
 
 /**
@@ -2404,3 +2423,5 @@ function wp_allowed_protocols()
 {
     WPhelper::stub('wp_allowed_protocols', func_get_args());
 }
+
+

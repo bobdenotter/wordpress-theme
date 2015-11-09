@@ -1,5 +1,7 @@
 <?php
 
+namespace Bolt\Extension\Bobdenotter\WPTheme;
+
 use Bolt\Configuration\ResourceManager;
 use Bolt\Helpers\Str;
 
@@ -52,7 +54,7 @@ class WPhelper {
     {
         $app = ResourceManager::getApp();
 
-        $app['twig.loader.filesystem']->addPath(__DIR__);
+        $app['twig.loader.filesystem']->addPath(dirname(__DIR__));
 
         return $app['twig']->render($template, $data);
     }

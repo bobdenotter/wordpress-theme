@@ -6,10 +6,10 @@ use Bolt\Application;
 use Bolt\BaseExtension;
 use Bolt\Pager;
 use Symfony\Component\HttpFoundation\Request;
+use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
 
-require_once(__DIR__ . '/wp-functions.php');
-require_once(__DIR__ . '/wp-helper.php');
-require_once(__DIR__ . '/wp-plugin.php');
+
+require_once(__DIR__ . '/src/WPhelper.php');
 
 class Extension extends BaseExtension
 {
@@ -21,10 +21,10 @@ class Extension extends BaseExtension
 
         if ($end =='frontend') {
 
-            chdir($this->app['paths']['themepath']);
+            require_once(__DIR__ . '/wp-functions.php');
+            require_once(__DIR__ . '/wp-plugin.php');
 
-            $GLOBALS['config'] = $this->app['config'];
-            $GLOBALS['paths'] = $this->app['paths'];
+
         }
 
     }
@@ -122,6 +122,11 @@ class Extension extends BaseExtension
             $GLOBALS[$key] = $value;
         }
 
+            chdir($this->app['paths']['themepath']);
+
+            $GLOBALS['config'] = $this->app['config'];
+            $GLOBALS['paths'] = $this->app['paths'];
+
         ob_start();
 
         require_once($templatefile);
@@ -130,7 +135,7 @@ class Extension extends BaseExtension
 
         $html = ob_get_clean();
 
-        $html = \WPhelper::outputQueue($html);
+        $html = WPhelper::outputQueue($html);
 
         return $html;
 

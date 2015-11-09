@@ -1,5 +1,7 @@
 <?php
 
+use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
+
 function have_posts()
 {
     global $posts;

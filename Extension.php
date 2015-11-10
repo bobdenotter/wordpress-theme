@@ -213,11 +213,12 @@ class Extension extends BaseExtension
 
         $this->loadWPCruft();
 
-        $customize = new WPcustomize();
+        $customize = new WPcustomize($this->app);
 
         do_action('customize_register', $customize);
 
         // $customize->dumpSettings();
+
         $data['output'] = $customize->getYaml();
 
         $data['text'] = "The following configuration file was generated automatically from the <tt>" .

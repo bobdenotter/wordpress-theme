@@ -4,6 +4,7 @@ namespace Bolt\Extension\Bobdenotter\WPTheme;
 
 use Bolt\Configuration\ResourceManager;
 use Bolt\Helpers\Str;
+use Cocur\Slugify\Slugify;
 
 class WPcustomize {
 
@@ -11,6 +12,11 @@ class WPcustomize {
 
     public static $cssQueue;
     public static $scriptQueue;
+
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
 
     public function get_setting()
     {
@@ -20,6 +26,11 @@ class WPcustomize {
     public function add_setting($id, $args = array())
     {
         $this->settings[$id] = $args;
+    }
+
+    public function add_panel($id, $args = array())
+    {
+        $this->panels[$id] = $args;
     }
 
     public function add_control($id, $args = array())
@@ -60,13 +71,15 @@ class WPcustomize {
         dump($this->controls);
         dump($this->settings);
         dump($this->sections);
-
+        dump($this->panels);
     }
 
     public function getYaml()
     {
         $output = '';
         $lastsection = '';
+
+        $slugify = Slugify::create('/[^a-z0-9_ -]+/');
 
         foreach($this->controls as $id => $control) {
 
@@ -108,7 +121,9 @@ class WPcustomize {
                 $default = $this->settings[$id]['default'];
             }
 
-            $output .= sprintf("%s: %s\n", $control->id, $default);
+            $id = $slugify->slugify($control->id);
+
+            $output .= sprintf("%s: %s\n", $id, $default);
 
         }
 

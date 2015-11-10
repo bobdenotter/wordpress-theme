@@ -1373,8 +1373,8 @@ function get_option($what)
 
 
         default:
-            WPhelper::stub('get_option', func_get_args());
-            return false;
+            // WPhelper::stub('get_option', func_get_args());
+            return '';
     }
 }
 
@@ -2503,4 +2503,84 @@ function add_image_size()
 function current_user_can()
 {
     WPhelper::stub('current_user_can', func_get_args());
+}
+
+/**
+ * Stub for wp_page_menu.
+ */
+function wp_page_menu()
+{
+    WPhelper::stub('wp_page_menu', func_get_args());
+}
+
+/**
+ * Stub for is_page_template.
+ */
+function is_page_template()
+{
+    WPhelper::stub('is_page_template', func_get_args());
+}
+
+/**
+ * Stub for get_search_form.
+ */
+function get_search_form()
+{
+    WPhelper::stub('get_search_form', func_get_args());
+}
+
+/**
+ * Stub for wp_get_archives.
+ */
+function wp_get_archives()
+{
+    WPhelper::stub('wp_get_archives', func_get_args());
+}
+
+/**
+ * Stub for wp_register.
+ */
+function wp_register()
+{
+    WPhelper::stub('wp_register', func_get_args());
+}
+
+/**
+ * Stub for wp_loginout.
+ */
+function wp_loginout()
+{
+    WPhelper::stub('wp_loginout', func_get_args());
+}
+
+/**
+ * Stub for wp_meta.
+ */
+function wp_meta()
+{
+    WPhelper::stub('wp_meta', func_get_args());
+}
+
+/**
+ * Stub for esc_attr__.
+ */
+function esc_attr__()
+{
+    WPhelper::stub('esc_attr__', func_get_args());
+}
+
+/**
+ * Stub for wp_register_style.
+ */
+function wp_register_style()
+{
+    WPhelper::stub('wp_register_style', func_get_args());
+}
+
+/**
+ * Stub for wp_register_script.
+ */
+function wp_register_script()
+{
+    WPhelper::stub('wp_register_script', func_get_args());
 }

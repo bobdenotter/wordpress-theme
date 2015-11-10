@@ -4,7 +4,7 @@ Todo's:
  - ~~`is_sticky`~~
  - Where does the thumbnail's width and height come from?
 
- - "defaults" must be added to theme's config.yml. 
+ - "defaults" must be added to theme's config.yml.
  See 'vantage's settings.php
     $defaults['logo_header_text'] = __('Call me! Maybe?', 'vantage');
 
@@ -68,7 +68,7 @@ posts:
 
 -------
 
-snippet for LowlevelExveption.php, around line 150:
+snippet for LowlevelException.php, around line 150:
 
 ```php
             // Added for WP-theme extension.

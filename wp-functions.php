@@ -2492,10 +2492,11 @@ function is_author()
     WPhelper::stub('is_author', func_get_args());
 }
 
+
 /**
- * Stub for wp_cache_add_non_persistent_groups.
+ * Stub for is_multisite.
  */
-function wp_cache_add_non_persistent_groups()
+function is_multisite()
 {
-    WPhelper::stub('wp_cache_add_non_persistent_groups', func_get_args());
+    return false;
 }

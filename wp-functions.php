@@ -126,35 +126,6 @@ function esc_url($str)
     return $str;
 }
 
-function get_template_directory_uri()
-{
-    global $paths;
-    return $paths['theme'];
-}
-
-/**
- * Stub for get_stylesheet_directory_uri.
- */
-function get_stylesheet_directory_uri()
-{
-    global $paths;
-    return $paths['theme'];
-}
-
-function get_template_directory()
-{
-    global $paths;
-    return $paths['themepath'];
-}
-
-function get_stylesheet_directory()
-{
-    global $paths;
-    return $paths['themepath'];
-}
-
-
-
 /**
  * Fire the wp_head action
  *
@@ -344,11 +315,6 @@ function get_bloginfo($show = '', $filter = 'raw')
         return $output;
 }
 
-
-function is_customize_preview()
-{
-    return false;
-}
 
 function get_sidebar()
 {
@@ -719,43 +685,6 @@ function is_sticky()
     return $post['sticky'];
 }
 
-/**
- * Stub for current_theme_supports.
- */
-function current_theme_supports( $feature )
-{
-    global $post;
-
-    if ( 'title-tag' == $feature ) {
-        // Don't confirm support unless called internally.
-        $trace = debug_backtrace();
-        if ( ! in_array( $trace[1]['function'], array( '_wp_render_title_tag', 'wp_title' ) ) ) {
-            return false;
-        }
-    }
-
-    // If no args passed then no extra checks need be performed
-    if ( func_num_args() <= 1 )
-        return true;
-
-    $args = array_slice( func_get_args(), 1 );
-
-    switch ( $feature ) {
-        case 'post-thumbnails':
-        case 'html5':
-            return true;
-
-        case 'post-formats':
-            return false;
-
-        case 'custom-header':
-        case 'custom-background' :
-            return false;
-
-        default:
-            return true; // #whatcouldgowrong?
-    }
-}
 
 /**
  * Stub for _x.
@@ -2040,20 +1969,6 @@ function add_query_arg() {
 }
 
 
-function get_stylesheet_uri() {
-    $stylesheet_dir_uri = get_stylesheet_directory_uri();
-    $stylesheet_uri = $stylesheet_dir_uri . '/style.css';
-    /**
-     * Filter the URI of the current theme stylesheet.
-     *
-     * @since 1.5.0
-     *
-     * @param string $stylesheet_uri     Stylesheet URI for the current theme/child theme.
-     * @param string $stylesheet_dir_uri Stylesheet directory URI for the current theme/child theme.
-     */
-    return apply_filters( 'stylesheet_uri', $stylesheet_uri, $stylesheet_dir_uri );
-}
-
 
 /**
  * Stub for wp_attachment_is_image.
@@ -2080,13 +1995,13 @@ function get_adjacent_post()
 }
 
 
-/**
- * Stub for get_theme_mod.
- */
-function get_theme_mod( $name, $default = false )
-{
-    return $default;
-}
+// /**
+//  * Stub for get_theme_mod.
+//  */
+// function get_theme_mod( $name, $default = false )
+// {
+//     return $default;
+// }
 
 
 /**
@@ -2320,21 +2235,13 @@ function next_post_link()
     WPhelper::stub('next_post_link', func_get_args());
 }
 
-/**
- * Stub for wp_get_theme.
- */
-function wp_get_theme()
-{
-    WPhelper::stub('wp_get_theme', func_get_args());
-}
-
-/**
- * Stub for get_header_image.
- */
-function get_header_image()
-{
-    WPhelper::stub('get_header_image', func_get_args());
-}
+// /**
+//  * Stub for get_header_image.
+//  */
+// function get_header_image()
+// {
+//     WPhelper::stub('get_header_image', func_get_args());
+// }
 
 /**
  * Stub for esc_html_e.
@@ -2350,14 +2257,6 @@ function esc_html_e()
 function wp_load_alloptions()
 {
     WPhelper::stub('wp_load_alloptions', func_get_args());
-}
-
-/**
- * Stub for is_child_theme.
- */
-function is_child_theme()
-{
-    WPhelper::stub('is_child_theme', func_get_args());
 }
 
 /**
@@ -2465,13 +2364,13 @@ function load_theme_textdomain()
     WPhelper::stub('load_theme_textdomain', func_get_args());
 }
 
-/**
- * Stub for add_theme_support.
- */
-function add_theme_support()
-{
-    WPhelper::stub('add_theme_support', func_get_args());
-}
+// /**
+//  * Stub for add_theme_support.
+//  */
+// function add_theme_support()
+// {
+//     WPhelper::stub('add_theme_support', func_get_args());
+// }
 
 /**
  * Stub for register_nav_menus.
@@ -2583,4 +2482,20 @@ function wp_register_style()
 function wp_register_script()
 {
     WPhelper::stub('wp_register_script', func_get_args());
+}
+
+/**
+ * Stub for is_author.
+ */
+function is_author()
+{
+    WPhelper::stub('is_author', func_get_args());
+}
+
+/**
+ * Stub for wp_cache_add_non_persistent_groups.
+ */
+function wp_cache_add_non_persistent_groups()
+{
+    WPhelper::stub('wp_cache_add_non_persistent_groups', func_get_args());
 }

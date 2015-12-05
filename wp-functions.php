@@ -2500,3 +2500,27 @@ function is_multisite()
 {
     return false;
 }
+
+/**
+ * Stub for wp_suspend_cache_addition.
+ */
+function wp_suspend_cache_addition()
+{
+    WPhelper::stub('wp_suspend_cache_addition', func_get_args());
+}
+
+/**
+ * Stub for esc_url_raw.
+ */
+function esc_url_raw()
+{
+    WPhelper::stub('esc_url_raw', func_get_args());
+}
+
+/**
+ * Stub for set_url_scheme.
+ */
+function set_url_scheme()
+{
+    WPhelper::stub('set_url_scheme', func_get_args());
+}

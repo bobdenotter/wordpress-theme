@@ -64,6 +64,7 @@ class Extension extends BaseExtension
         require_once(__DIR__ . '/wp-includes/kses.php');
         require_once(__DIR__ . '/wp-includes/widgets.php');
         require_once(__DIR__ . '/wp-includes/theme.php');
+        require_once(__DIR__ . '/wp-includes/class-wp-error.php');
         require_once(__DIR__ . '/wp-includes/class-wp-theme.php');
         require_once(__DIR__ . '/wp-includes/class-wp-customize-control.php');
 

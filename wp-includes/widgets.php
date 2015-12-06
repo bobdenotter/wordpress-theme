@@ -1206,6 +1206,8 @@ function dynamic_sidebar($index = 1) {
 		}
 	}
 
+    echo Bolt\Extension\Bobdenotter\WPTheme\WPhelper::render('wp-twighelpers/dynamic_sidebar.twig', [ 'index' => $index ]);
+
 	$sidebars_widgets = wp_get_sidebars_widgets();
 	if ( empty( $wp_registered_sidebars[ $index ] ) || empty( $sidebars_widgets[ $index ] ) || ! is_array( $sidebars_widgets[ $index ] ) ) {
 		/** This action is documented in wp-includes/widgets.php */
@@ -1429,9 +1431,12 @@ function is_dynamic_sidebar() {
  * @return bool true if the sidebar is in use, false otherwise.
  */
 function is_active_sidebar( $index ) {
+
 	$index = ( is_int($index) ) ? "sidebar-$index" : sanitize_title($index);
-	$sidebars_widgets = wp_get_sidebars_widgets();
-	$is_active_sidebar = ! empty( $sidebars_widgets[$index] );
+	// Modified for Bolt.
+    $hasWidgets = Bolt\Extension\Bobdenotter\WPTheme\WPhelper::render('wp-twighelpers/is_active_sidebar.twig', [ 'index' => $index ]);
+
+	$is_active_sidebar = ! empty( $hasWidgets );
 
 	/**
 	 * Filter whether a dynamic sidebar is considered "active".

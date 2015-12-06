@@ -438,9 +438,19 @@ function has_nav_menu()
 /**
  * Stub for wp_nav_menu.
  */
-function wp_nav_menu()
+function wp_nav_menu($args)
 {
-    WPhelper::stub('wp_nav_menu', func_get_args());
+    global $app;
+
+    // If we have only one menu defined, we should just use that, regardless of the passed-in 'theme_location'
+    $boltmenu = $app['config']->get('menu');
+
+    if (count($boltmenu) == 1) {
+        $args['theme_location'] = key($boltmenu);
+    }
+
+    echo WPhelper::render('wp-twighelpers/wp_nav_menu.twig', ['args' => $args ]);
+
 }
 
 /**
@@ -904,7 +914,7 @@ function get_permalink()
  */
 function get_comments_number()
 {
-    WPhelper::stub('get_comments_number', func_get_args());
+    return '';
 }
 
 /**

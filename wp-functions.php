@@ -121,10 +121,9 @@ function bloginfo()
     echo $config->get('general/sitename');
 }
 
-function esc_url($str)
-{
-    return $str;
-}
+
+
+
 
 /**
  * Fire the wp_head action
@@ -557,9 +556,6 @@ function get_the_post_thumbnail( $post_id = null, $size = 'post-thumbnail', $att
 }
 
 
-/**
- * Stub for is_single.
- */
 function is_single()
 {
     global $request;
@@ -1129,156 +1125,6 @@ function get_taxonomies()
     return $atoms;
 }
 
-/**
- * Escaping for HTML attributes.
- *
- * @since 2.8.0
- *
- * @param string $text
- * @return string
- */
-function esc_attr( $text ) {
-    $safe_text = wp_check_invalid_utf8( $text );
-    $safe_text = _wp_specialchars( $safe_text, ENT_QUOTES );
-    /**
-     * Filter a string cleaned and escaped for output in an HTML attribute.
-     *
-     * Text passed to esc_attr() is stripped of invalid or special characters
-     * before output.
-     *
-     * @since 2.0.6
-     *
-     * @param string $safe_text The text after it has been escaped.
-     * @param string $text      The text prior to being escaped.
-     */
-    return apply_filters( 'attribute_escape', $safe_text, $text );
-}
-
-
-/**
- * Checks for invalid UTF8 in a string.
- *
- * @since 2.8.0
- *
- * @staticvar bool $is_utf8
- * @staticvar bool $utf8_pcre
- *
- * @param string  $string The text which is to be checked.
- * @param bool    $strip Optional. Whether to attempt to strip out invalid UTF8. Default is false.
- * @return string The checked text.
- */
-function wp_check_invalid_utf8( $string, $strip = false ) {
-    $string = (string) $string;
-
-    if ( 0 === strlen( $string ) ) {
-        return '';
-    }
-
-    // Store the site charset as a static to avoid multiple calls to get_option()
-    static $is_utf8 = null;
-    if ( ! isset( $is_utf8 ) ) {
-        $is_utf8 = in_array( get_option( 'blog_charset' ), array( 'utf8', 'utf-8', 'UTF8', 'UTF-8' ) );
-    }
-    if ( ! $is_utf8 ) {
-        return $string;
-    }
-
-    // Check for support for utf8 in the installed PCRE library once and store the result in a static
-    static $utf8_pcre = null;
-    if ( ! isset( $utf8_pcre ) ) {
-        $utf8_pcre = @preg_match( '/^./u', 'a' );
-    }
-    // We can't demand utf8 in the PCRE installation, so just return the string in those cases
-    if ( !$utf8_pcre ) {
-        return $string;
-    }
-
-    // preg_match fails when it encounters invalid UTF8 in $string
-    if ( 1 === @preg_match( '/^./us', $string ) ) {
-        return $string;
-    }
-
-    // Attempt to strip the bad chars if requested (not recommended)
-    if ( $strip && function_exists( 'iconv' ) ) {
-        return iconv( 'utf-8', 'utf-8', $string );
-    }
-
-    return '';
-}
-
-/**
- * Converts a number of special characters into their HTML entities.
- *
- * Specifically deals with: &, <, >, ", and '.
- *
- * $quote_style can be set to ENT_COMPAT to encode " to
- * &quot;, or ENT_QUOTES to do both. Default is ENT_NOQUOTES where no quotes are encoded.
- *
- * @since 1.2.2
- * @access private
- *
- * @staticvar string $_charset
- *
- * @param string $string         The text which is to be encoded.
- * @param int    $quote_style    Optional. Converts double quotes if set to ENT_COMPAT, both single and double if set to ENT_QUOTES or none if set to ENT_NOQUOTES. Also compatible with old values; converting single quotes if set to 'single', double if set to 'double' or both if otherwise set. Default is ENT_NOQUOTES.
- * @param string $charset        Optional. The character encoding of the string. Default is false.
- * @param bool   $double_encode  Optional. Whether to encode existing html entities. Default is false.
- * @return string The encoded text with HTML entities.
- */
-function _wp_specialchars( $string, $quote_style = ENT_NOQUOTES, $charset = false, $double_encode = false ) {
-    $string = (string) $string;
-
-    if ( 0 === strlen( $string ) )
-        return '';
-
-    // Don't bother if there are no specialchars - saves some processing
-    if ( ! preg_match( '/[&<>"\']/', $string ) )
-        return $string;
-
-    // Account for the previous behaviour of the function when the $quote_style is not an accepted value
-    if ( empty( $quote_style ) )
-        $quote_style = ENT_NOQUOTES;
-    elseif ( ! in_array( $quote_style, array( 0, 2, 3, 'single', 'double' ), true ) )
-        $quote_style = ENT_QUOTES;
-
-    // Store the site charset as a static to avoid multiple calls to wp_load_alloptions()
-    if ( ! $charset ) {
-        static $_charset = null;
-        if ( ! isset( $_charset ) ) {
-            $alloptions = wp_load_alloptions();
-            $_charset = isset( $alloptions['blog_charset'] ) ? $alloptions['blog_charset'] : '';
-        }
-        $charset = $_charset;
-    }
-
-    if ( in_array( $charset, array( 'utf8', 'utf-8', 'UTF8' ) ) )
-        $charset = 'UTF-8';
-
-    $_quote_style = $quote_style;
-
-    if ( $quote_style === 'double' ) {
-        $quote_style = ENT_COMPAT;
-        $_quote_style = ENT_COMPAT;
-    } elseif ( $quote_style === 'single' ) {
-        $quote_style = ENT_NOQUOTES;
-    }
-
-    if ( ! $double_encode ) {
-        // Guarantee every &entity; is valid, convert &garbage; into &amp;garbage;
-        // This is required for PHP < 5.4.0 because ENT_HTML401 flag is unavailable.
-        $string = wp_kses_normalize_entities( $string );
-    }
-
-    $string = @htmlspecialchars( $string, $quote_style, $charset, $double_encode );
-
-    // Backwards compatibility
-    if ( 'single' === $_quote_style )
-        $string = str_replace( "'", '&#039;', $string );
-
-    return $string;
-}
-
-
 
 /**
  * Stub for get_option.
@@ -1699,67 +1545,7 @@ function _navigation_markup( $links, $class = 'posts-navigation', $screen_reader
     return sprintf( $template, sanitize_html_class( $class ), esc_html( $screen_reader_text ), $links );
 }
 
-/**
- * Sanitizes an HTML classname to ensure it only contains valid characters.
- *
- * Strips the string down to A-Z,a-z,0-9,_,-. If this results in an empty
- * string then it will return the alternative value supplied.
- *
- * @todo Expand to support the full range of CDATA that a class attribute can contain.
- *
- * @since 2.8.0
- *
- * @param string $class    The classname to be sanitized
- * @param string $fallback Optional. The value to return if the sanitization ends up as an empty string.
- *  Defaults to an empty string.
- * @return string The sanitized value
- */
-function sanitize_html_class( $class, $fallback = '' ) {
-    //Strip out any % encoded octets
-    $sanitized = preg_replace( '|%[a-fA-F0-9][a-fA-F0-9]|', '', $class );
 
-    //Limit to A-Z,a-z,0-9,_,-
-    $sanitized = preg_replace( '/[^A-Za-z0-9_-]/', '', $sanitized );
-
-    if ( '' == $sanitized )
-        $sanitized = $fallback;
-
-    /**
-     * Filter a sanitized HTML class string.
-     *
-     * @since 2.8.0
-     *
-     * @param string $sanitized The sanitized HTML class.
-     * @param string $class     HTML class before sanitization.
-     * @param string $fallback  The fallback string.
-     */
-    return apply_filters( 'sanitize_html_class', $sanitized, $class, $fallback );
-}
-
-/**
- * Escaping for HTML blocks.
- *
- * @since 2.8.0
- *
- * @param string $text
- * @return string
- */
-function esc_html( $text ) {
-    $safe_text = wp_check_invalid_utf8( $text );
-    $safe_text = _wp_specialchars( $safe_text, ENT_QUOTES );
-    /**
-     * Filter a string cleaned and escaped for output in HTML.
-     *
-     * Text passed to esc_html() is stripped of invalid or special characters
-     * before output.
-     *
-     * @since 2.8.0
-     *
-     * @param string $safe_text The text after it has been escaped.
-     * @param string $text      The text prior to being escaped.
-     */
-    return apply_filters( 'esc_html', $safe_text, $text );
-}
 
 /**
  * Retrieve the name of the highest priority template file that exists.
@@ -1995,55 +1781,6 @@ function get_adjacent_post()
 }
 
 
-// /**
-//  * Stub for get_theme_mod.
-//  */
-// function get_theme_mod( $name, $default = false )
-// {
-//     return $default;
-// }
-
-
-/**
- * Parses a string into variables to be stored in an array.
- *
- * Uses {@link http://www.php.net/parse_str parse_str()} and stripslashes if
- * {@link http://www.php.net/magic_quotes magic_quotes_gpc} is on.
- *
- * @since 2.2.1
- *
- * @param string $string The string to be parsed.
- * @param array  $array  Variables will be stored in this array.
- */
-function wp_parse_str( $string, &$array ) {
-    parse_str( $string, $array );
-    if ( get_magic_quotes_gpc() )
-        $array = stripslashes_deep( $array );
-    /**
-     * Filter the array of variables derived from a parsed string.
-     *
-     * @since 2.3.0
-     *
-     * @param array $array The array populated with variables.
-     */
-    $array = apply_filters( 'wp_parse_str', $array );
-}
-
-
-
-/**
- * Navigates through an array and encodes the values to be used in a URL.
- *
- *
- * @since 2.2.0
- *
- * @param array|string $value The array or string to be encoded.
- * @return array|string $value The encoded array (or string from the callback).
- */
-function urlencode_deep( $value ) {
-    return is_array( $value ) ? array_map( 'urlencode_deep', $value ) : urlencode( $value );
-}
-
 
 /**
  * Build URL query based on an associative and, or indexed array.
@@ -2152,7 +1889,12 @@ function is_archive()
  */
 function is_search()
 {
-    WPhelper::stub('is_search', func_get_args());
+    global $request;
+
+    $route = $request->get('_route');
+    $okroutes = [ 'search' ];
+
+    return in_array($route, $okroutes);
 }
 
 /**
@@ -2161,14 +1903,6 @@ function is_search()
 function get_post_custom()
 {
     WPhelper::stub('get_post_custom', func_get_args());
-}
-
-/**
- * Stub for sanitize_title.
- */
-function sanitize_title()
-{
-    WPhelper::stub('sanitize_title', func_get_args());
 }
 
 /**
@@ -2489,7 +2223,7 @@ function wp_register_script()
  */
 function is_author()
 {
-    WPhelper::stub('is_author', func_get_args());
+    return false;
 }
 
 
@@ -2501,26 +2235,120 @@ function is_multisite()
     return false;
 }
 
+
+
 /**
- * Stub for wp_suspend_cache_addition.
+ * Temporarily suspend cache additions.
+ *
+ * Stops more data being added to the cache, but still allows cache retrieval.
+ * This is useful for actions, such as imports, when a lot of data would otherwise
+ * be almost uselessly added to the cache.
+ *
+ * Suspension lasts for a single page load at most. Remember to call this
+ * function again if you wish to re-enable cache adds earlier.
+ *
+ * @since 3.3.0
+ *
+ * @staticvar bool $_suspend
+ *
+ * @param bool $suspend Optional. Suspends additions if true, re-enables them if false.
+ * @return bool The current suspend setting
  */
-function wp_suspend_cache_addition()
-{
-    WPhelper::stub('wp_suspend_cache_addition', func_get_args());
+function wp_suspend_cache_addition( $suspend = null ) {
+    static $_suspend = false;
+
+    if ( is_bool( $suspend ) )
+        $_suspend = $suspend;
+
+    return $_suspend;
 }
 
 /**
- * Stub for esc_url_raw.
+ * Suspend cache invalidation.
+ *
+ * Turns cache invalidation on and off. Useful during imports where you don't wont to do
+ * invalidations every time a post is inserted. Callers must be sure that what they are
+ * doing won't lead to an inconsistent cache when invalidation is suspended.
+ *
+ * @since 2.7.0
+ *
+ * @global bool $_wp_suspend_cache_invalidation
+ *
+ * @param bool $suspend Optional. Whether to suspend or enable cache invalidation. Default true.
+ * @return bool The current suspend setting.
  */
-function esc_url_raw()
-{
-    WPhelper::stub('esc_url_raw', func_get_args());
+function wp_suspend_cache_invalidation( $suspend = true ) {
+    global $_wp_suspend_cache_invalidation;
+
+    $current_suspend = $_wp_suspend_cache_invalidation;
+    $_wp_suspend_cache_invalidation = $suspend;
+    return $current_suspend;
 }
 
+
+
 /**
- * Stub for set_url_scheme.
+ * Set the scheme for a URL
+ *
+ * @since 3.4.0
+ *
+ * @param string $url    Absolute url that includes a scheme
+ * @param string $scheme Optional. Scheme to give $url. Currently 'http', 'https', 'login', 'login_post', 'admin', or 'relative'.
+ * @return string $url URL with chosen scheme.
  */
-function set_url_scheme()
-{
-    WPhelper::stub('set_url_scheme', func_get_args());
+function set_url_scheme( $url, $scheme = null ) {
+    $orig_scheme = $scheme;
+
+    if ( ! $scheme ) {
+        $scheme = is_ssl() ? 'https' : 'http';
+    } elseif ( $scheme === 'admin' || $scheme === 'login' || $scheme === 'login_post' || $scheme === 'rpc' ) {
+        $scheme = is_ssl() || force_ssl_admin() ? 'https' : 'http';
+    } elseif ( $scheme !== 'http' && $scheme !== 'https' && $scheme !== 'relative' ) {
+        $scheme = is_ssl() ? 'https' : 'http';
+    }
+
+    $url = trim( $url );
+    if ( substr( $url, 0, 2 ) === '//' )
+        $url = 'http:' . $url;
+
+    if ( 'relative' == $scheme ) {
+        $url = ltrim( preg_replace( '#^\w+://[^/]*#', '', $url ) );
+        if ( $url !== '' && $url[0] === '/' )
+            $url = '/' . ltrim($url , "/ \t\n\r\0\x0B" );
+    } else {
+        $url = preg_replace( '#^\w+://#', $scheme . '://', $url );
+    }
+
+    /**
+     * Filter the resulting URL after setting the scheme.
+     *
+     * @since 3.4.0
+     *
+     * @param string $url         The complete URL including scheme and path.
+     * @param string $scheme      Scheme applied to the URL. One of 'http', 'https', or 'relative'.
+     * @param string $orig_scheme Scheme requested for the URL. One of 'http', 'https', 'login',
+     *                            'login_post', 'admin', 'rpc', or 'relative'.
+     */
+    return apply_filters( 'set_url_scheme', $url, $scheme, $orig_scheme );
 }
+
+
+/**
+ * Determine if SSL is used.
+ *
+ * @since 2.6.0
+ *
+ * @return bool True if SSL, false if not used.
+ */
+function is_ssl() {
+    if ( isset($_SERVER['HTTPS']) ) {
+        if ( 'on' == strtolower($_SERVER['HTTPS']) )
+            return true;
+        if ( '1' == $_SERVER['HTTPS'] )
+            return true;
+    } elseif ( isset($_SERVER['SERVER_PORT']) && ( '443' == $_SERVER['SERVER_PORT'] ) ) {
+        return true;
+    }
+    return false;
+}
+

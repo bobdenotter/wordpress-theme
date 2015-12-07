@@ -226,6 +226,12 @@ class Extension extends BaseExtension
             "</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
         // dump($data);
 
+        $result = $customize->writeThemeYaml($data['output']);
+
+        if (!$result) {
+            echo "File not saved!";
+        }
+
         $this->app['twig.loader.filesystem']->addPath(__DIR__);
 
         return $this->app['twig']->render('wp-theme-templates/dashboard.twig', $data);

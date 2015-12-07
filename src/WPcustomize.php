@@ -5,6 +5,8 @@ namespace Bolt\Extension\Bobdenotter\WPTheme;
 use Bolt\Configuration\ResourceManager;
 use Bolt\Helpers\Str;
 use Cocur\Slugify\Slugify;
+use Symfony\Component\Filesystem\Exception\IOException;
+use Symfony\Component\Filesystem\Filesystem;
 
 class WPcustomize {
 
@@ -13,9 +15,13 @@ class WPcustomize {
     public static $cssQueue;
     public static $scriptQueue;
 
+    /** @var \Symfony\Component\Filesystem\Filesystem */
+    protected $filesystem;
+
     public function __construct($app)
     {
         $this->app = $app;
+        $this->filesystem = new Filesystem();
     }
 
     public function get_setting()
@@ -129,6 +135,18 @@ class WPcustomize {
 
         return $output;
 
+    }
+
+    public function writeThemeYaml($yaml)
+    {
+        $filename = $this->app['paths']['themepath'] . "/theme.yml";
+        try {
+            $this->filesystem->dumpFile($filename, $yaml);
+        } catch (IOException $e) {
+            dump($e);
+            return false;
+        }
+        return true;
     }
 
 

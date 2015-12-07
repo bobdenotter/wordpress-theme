@@ -1396,7 +1396,7 @@ function get_locale()
  */
 function the_permalink()
 {
-    WPhelper::stub('the_permalink', func_get_args());
+    echo get_permalink();
 }
 
 /**
@@ -1702,6 +1702,21 @@ function get_next_post_link( $format = '&laquo; %link', $link = '%title' )
 }
 
 
+/**
+ * Stub for previous_post_link.
+ */
+function previous_post_link()
+{
+    echo get_previous_post_link();
+}
+
+/**
+ * Stub for next_post_link.
+ */
+function next_post_link()
+{
+    echo get_next_post_link();
+}
 
 /**
  * Convert given date string into a different format.
@@ -2179,21 +2194,7 @@ function get_the_tags()
     WPhelper::stub('get_the_tags', func_get_args());
 }
 
-/**
- * Stub for previous_post_link.
- */
-function previous_post_link()
-{
-    WPhelper::stub('previous_post_link', func_get_args());
-}
 
-/**
- * Stub for next_post_link.
- */
-function next_post_link()
-{
-    WPhelper::stub('next_post_link', func_get_args());
-}
 
 // /**
 //  * Stub for get_header_image.

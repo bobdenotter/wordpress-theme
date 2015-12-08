@@ -87,6 +87,8 @@ class WPcustomize {
 
         $slugify = Slugify::create('/[^a-z0-9_ -]+/');
 
+        $escaper = new \Symfony\Component\Yaml\Escaper();
+
         foreach($this->controls as $id => $control) {
 
             if ($control->section != $lastsection) {
@@ -125,6 +127,9 @@ class WPcustomize {
             $default = "";
             if (isset($this->settings[$id])) {
                 $default = $this->settings[$id]['default'];
+                if ($escaper->requiresSingleQuoting($default)) {
+                    $default = $escaper->escapeWithSingleQuotes($default);
+                }
             }
 
             $id = $slugify->slugify($control->id);

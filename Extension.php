@@ -80,10 +80,11 @@ class Extension extends BaseExtension
             require_once('functions.php');
         }
 
-        $yaml = new \Symfony\Component\Yaml\Parser();
-        $GLOBALS['theme_config'] = $yaml->parse(file_get_contents($this->app['paths']['themepath'] . '/theme.yml'));
-
-        dump($GLOBALS['theme_config']);
+        // Get the theme.yml, if it exists.
+        if (is_readable($this->app['paths']['themepath'] . '/theme.yml')) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $GLOBALS['theme_config'] = $yaml->parse(file_get_contents($this->app['paths']['themepath'] . '/theme.yml'));
+        }
 
     }
 

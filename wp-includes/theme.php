@@ -915,6 +915,13 @@ function get_theme_mods() {
  * @return string
  */
 function get_theme_mod( $name, $default = false ) {
+	global $theme_config;
+
+	// Added for Bolt.
+	if (!empty($theme_config[$name])) {
+		return $theme_config[$name];
+	}
+
 	$mods = get_theme_mods();
 
 	if ( isset( $mods[$name] ) ) {

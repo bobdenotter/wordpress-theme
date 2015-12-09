@@ -79,6 +79,13 @@ class Extension extends BaseExtension
         if (file_exists('functions.php')) {
             require_once('functions.php');
         }
+
+        // Get the theme.yml, if it exists.
+        if (is_readable($this->app['paths']['themepath'] . '/theme.yml')) {
+            $yaml = new \Symfony\Component\Yaml\Parser();
+            $GLOBALS['theme_config'] = $yaml->parse(file_get_contents($this->app['paths']['themepath'] . '/theme.yml'));
+        }
+
     }
 
 

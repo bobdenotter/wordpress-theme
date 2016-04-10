@@ -1,18 +1,17 @@
 <?php
 
-namespace Bolt\Extension\Bobdenotter\WPTheme;
+namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
-use Bolt\Application;
-use Bolt\BaseExtension;
-use Bolt\Pager;
+use Bolt\Extension\SimpleExtension;
+
+//use Bolt\Pager;
 use Symfony\Component\HttpFoundation\Request;
-use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
+//use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
 
-require_once(__DIR__ . '/src/WPhelper.php');
+//require_once(__DIR__ . '/src/WPhelper.php');
 
-class Extension extends BaseExtension
+class WordpressThemeExtension extends SimpleExtension
 {
-
 
     public function initialize()
     {
@@ -27,11 +26,6 @@ class Extension extends BaseExtension
         $this->app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
         $this->app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
 
-    }
-
-    public function getName()
-    {
-        return "WP Theme";
     }
 
     public function before(Request $request)

@@ -87,7 +87,7 @@ class WordpressHelper {
             $app = ResourceManager::getApp();
 
             $jqueryfile = $app['paths']['extensions'] . basename(dirname(dirname(__DIR__))) . '/' .
-                    basename(dirname(__DIR__)) . '/wp-theme/assets/jquery-2.2.3.min.js';
+                    basename(dirname(__DIR__)) . '/wordpress-theme/assets/jquery-2.2.3.min.js';
             self::enqueueScript('jquery', $jqueryfile);
         }
 

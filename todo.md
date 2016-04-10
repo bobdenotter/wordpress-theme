@@ -8,6 +8,12 @@ Todo's:
  See 'vantage's settings.php
     $defaults['logo_header_text'] = __('Call me! Maybe?', 'vantage');
 
+Added 2016-04-10:
+ - How to "trigger" copying of assets from assets/ folder to public/
+ - http://wptheme.localhost/extensions/bobdenotter/Wordpress-theme/Wordpress-theme/assets/jquery-2.2.3.min.js < does that name make sense?
+
+
+
 
 -------
 
@@ -71,7 +77,7 @@ posts:
 snippet for LowlevelException.php, around line 150:
 
 ```php
-            // Added for WP-theme extension.
+            // Added for Wordpress-theme extension.
             $match = preg_match('/Call to undefined function ([A-Za-z0-9_-]+)\(\)/i', $error['message'], $matches);
             if (!empty($matches[1])) {
                 $functionname = $matches[1];
@@ -86,13 +92,13 @@ function {$functionname}()
 }
 
 EOM;
-                $filename = dirname(dirname(__DIR__)) . '/extensions/local/bobdenotter/wp-theme/wp-functions.php';
+                $filename = dirname(dirname(__DIR__)) . '/extensions/local/bobdenotter/wordpress-theme/wp-functions.php';
                 if(file_put_contents($filename, $add, FILE_APPEND)) {
                     echo "<mark>Added $functionname !</mark>";
                 }
 
             }
-            // End of added for WP-theme extension.
+            // End of added for Wordpress extension.
 
 
 ```

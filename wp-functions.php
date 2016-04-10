@@ -1007,6 +1007,30 @@ function comments_open()
     return (!empty(array_intersect($needed, $enabled)));
 }
 
+/**
+ * Stub for have_comments.
+ */
+function have_comments()
+{
+    return false;
+}
+
+/**
+ * Stub for comment_form.
+ */
+function comment_form()
+{
+    global $app;
+
+    $enabled = array_keys($app['extensions']->all());
+
+    if (in_array('Bolt/Disqus', $enabled)) {
+        echo WordpressHelper::render('wp-twighelpers/comment_form_disqus.twig');
+    } elseif (in_array('Bolt/FacebookComments', $enabled)) {
+        echo WordpressHelper::render('wp-twighelpers/comment_form_facebook.twig');
+    }
+}
+
 
 /**
  * Load the comment template specified in $file.
@@ -1576,25 +1600,6 @@ function get_query_var()
 {
     WordpressHelper::stub('get_query_var', func_get_args());
 }
-
-/**
- * Stub for have_comments.
- */
-function have_comments()
-{
-    return false;
-}
-
-/**
- * Stub for comment_form.
- */
-function comment_form()
-{
-    $data = [];
-
-    echo WordpressHelper::render('wp-twighelpers/comment_form.twig', $data);
-}
-
 
 /**
  * Merge user defined arguments into defaults array.

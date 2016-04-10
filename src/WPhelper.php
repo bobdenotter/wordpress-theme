@@ -1,11 +1,11 @@
 <?php
 
-namespace Bolt\Extension\Bobdenotter\WPTheme;
+namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
 use Bolt\Configuration\ResourceManager;
 use Bolt\Helpers\Str;
 
-class WPhelper {
+class WordpressHelper {
 
     public static $markCssOutputted;
 
@@ -140,7 +140,7 @@ class WPhelper {
         }
     }
 
-    public function outputQueue($html)
+    static function outputQueue($html)
     {
         if (!empty(self::$cssQueue)) {
             $html = self::insertAfterMeta(implode('', self::$cssQueue), $html);
@@ -162,7 +162,7 @@ class WPhelper {
 
     }
 
-    private function lowercasePDangit($html)
+    static function lowercasePDangit($html)
     {
         return preg_replace('/WordPress/i', 'Wordpress', $html);
     }

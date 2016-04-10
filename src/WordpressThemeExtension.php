@@ -2,40 +2,42 @@
 
 namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
+use Bolt\Configuration\ResourceManager;
 use Bolt\Extension\SimpleExtension;
 
 //use Bolt\Pager;
+use Bolt\Pager\Pager;
 use Symfony\Component\HttpFoundation\Request;
-//use Bolt\Extension\Bobdenotter\WPTheme\WPhelper;
 
-//require_once(__DIR__ . '/src/WPhelper.php');
 
 class WordpressThemeExtension extends SimpleExtension
 {
 
     public function initialize()
     {
-        $end = $this->app['config']->getWhichEnd();
+        $end = $app['config']->getWhichEnd();
 
         if ($end =='frontend') {
             $this->loadWPCruft();
         }
 
-        $root = $this->app['resources']->getUrl('bolt');
+        $root = $app['resources']->getUrl('bolt');
         $this->addMenuOption('WP Theme', $root . 'wp-theme', 'fa:wordpress');
-        $this->app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
-        $this->app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
+        $app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
+        $app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
 
     }
 
     public function before(Request $request)
     {
+        $this->loadWPCruft();
 
         $route = $request->get('_route');
 
         if (substr($route, 0, 3) === 'wp-') {
 
             if (file_exists('functions.php')) {
+
                 require_once('functions.php');
             }
 
@@ -52,41 +54,48 @@ class WordpressThemeExtension extends SimpleExtension
 
     public function loadWPCruft()
     {
-        require_once(__DIR__ . '/wp-functions.php');
-        require_once(__DIR__ . '/wp-plugin.php');
-        require_once(__DIR__ . '/wp-includes/cache.php');
-        require_once(__DIR__ . '/wp-includes/kses.php');
-        require_once(__DIR__ . '/wp-includes/formatting.php');
-        require_once(__DIR__ . '/wp-includes/widgets.php');
-        require_once(__DIR__ . '/wp-includes/theme.php');
-        require_once(__DIR__ . '/wp-includes/class-wp-error.php');
-        require_once(__DIR__ . '/wp-includes/class-wp-theme.php');
-        require_once(__DIR__ . '/wp-includes/class-wp-customize-control.php');
+        require_once(dirname(__DIR__) . '/wp-functions.php');
+        require_once(dirname(__DIR__) . '/wp-plugin.php');
+        require_once(dirname(__DIR__) . '/wp-includes/cache.php');
+        require_once(dirname(__DIR__) . '/wp-includes/kses.php');
+        require_once(dirname(__DIR__) . '/wp-includes/formatting.php');
+        require_once(dirname(__DIR__) . '/wp-includes/widgets.php');
+        require_once(dirname(__DIR__) . '/wp-includes/theme.php');
+        require_once(dirname(__DIR__) . '/wp-includes/class-wp-error.php');
+        require_once(dirname(__DIR__) . '/wp-includes/class-wp-theme.php');
+        require_once(dirname(__DIR__) . '/wp-includes/class-wp-customize-control.php');
 
         wp_cache_init();
 
-        chdir($this->app['paths']['themepath']);
+        // TODO: Figure out why `$this->getContainer` doesn't work.
+        // $app = $this->getContainer();
+        $app = ResourceManager::getApp();
 
-        $GLOBALS['config'] = $this->app['config'];
-        $GLOBALS['paths'] = $this->app['paths'];
+        chdir($app['paths']['themepath']);
+
+        $GLOBALS['config'] = $app['config'];
+        $GLOBALS['paths'] = $app['paths'];
 
         if (file_exists('functions.php')) {
             require_once('functions.php');
         }
 
         // Get the theme.yml, if it exists.
-        if (is_readable($this->app['paths']['themepath'] . '/theme.yml')) {
+        if (is_readable($app['paths']['themepath'] . '/theme.yml')) {
             $yaml = new \Symfony\Component\Yaml\Parser();
-            $GLOBALS['theme_config'] = $yaml->parse(file_get_contents($this->app['paths']['themepath'] . '/theme.yml'));
+            $GLOBALS['theme_config'] = $yaml->parse(file_get_contents($app['paths']['themepath'] . '/theme.yml'));
         }
-
     }
 
 
     public function homepage()
     {
+        // TODO: Figure out why `$this->getContainer` doesn't work.
+        // $app = $this->getContainer();
+        $app = ResourceManager::getApp();
+
         // Get the 'record' / 'records' for the homepage
-        $content = $this->app['storage']->getContent($this->app['config']->get('general/homepage'));
+        $content = $app['storage']->getContent($app['config']->get('general/homepage'));
 
         if (is_array($content)) {
             $first = current($content);
@@ -108,26 +117,26 @@ class WordpressThemeExtension extends SimpleExtension
 
     public function record($contenttypeslug, $slug = '')
     {
-        $contenttype = $this->app['storage']->getContentType($contenttypeslug);
+        $contenttype = $app['storage']->getContentType($contenttypeslug);
 
         // If the contenttype is 'viewless', don't show the record page.
         if (isset($contenttype['viewless']) && $contenttype['viewless'] === true) {
-            return $this->app->abort(Response::HTTP_NOT_FOUND, "Page $contenttypeslug/$slug not found.");
+            return $app->abort(Response::HTTP_NOT_FOUND, "Page $contenttypeslug/$slug not found.");
         }
 
         // Perhaps we don't have a slug. Let's see if we can pick up the 'id', instead.
         if (empty($slug)) {
-            $slug = $this->app['request']->get('id');
+            $slug = $app['request']->get('id');
         }
 
-        $slug = $this->app['slugify']->slugify($slug);
+        $slug = $app['slugify']->slugify($slug);
 
         // First, try to get it by slug.
-        $post = $this->app['storage']->getContent($contenttype['slug'], array('slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)));
+        $post = $app['storage']->getContent($contenttype['slug'], array('slug' => $slug, 'returnsingle' => true, 'log_not_found' => !is_numeric($slug)));
 
         if (!$post && is_numeric($slug)) {
             // And otherwise try getting it by ID
-            $post = $this->app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
+            $post = $app['storage']->getContent($contenttype['slug'], array('id' => $slug, 'returnsingle' => true));
         }
 
         $globals = [
@@ -141,22 +150,27 @@ class WordpressThemeExtension extends SimpleExtension
 
     private function render($templatefile, $globals = [])
     {
-        $globals['app'] = $this->app;
-        $globals['currentuser'] = $this->app['users']->getCurrentUser();
+        // TODO: Figure out why `$this->getContainer` doesn't work.
+        // $app = $this->getContainer();
+        $app = ResourceManager::getApp();
+
+        $globals['app'] = $app;
+        $globals['currentuser'] = $app['users']->getCurrentUser();
 
         foreach($globals as $key =>$value) {
             $GLOBALS[$key] = $value;
         }
 
         ob_start();
-
+        dump(getcwd());
+        dump($templatefile);
         require_once($templatefile);
 
         do_action('wp_enqueue_scripts');
 
         $html = ob_get_clean();
 
-        $html = WPhelper::outputQueue($html);
+        $html = WordpressHelper::outputQueue($html);
 
         return $html;
 
@@ -164,40 +178,44 @@ class WordpressThemeExtension extends SimpleExtension
 
     private function getPagedRecords($contenttypeslug = 'posts')
     {
-        $contenttype = $this->app['storage']->getContentType($contenttypeslug);
+        // TODO: Figure out why `$this->getContainer` doesn't work.
+        // $app = $this->getContainer();
+        $app = ResourceManager::getApp();
 
-        $pagerid = Pager::makeParameterId($contenttypeslug);
+        $contenttype = $app['storage']->getContentType($contenttypeslug);
+
+//        $pagerid = Pager::makeParameterId($contenttypeslug);
         // First, get some content
-        $page = $this->app['request']->query->get($pagerid, $this->app['request']->query->get('page', 1));
+        $page = $app['request']->query->get($pagerid, $app['request']->query->get('page', 1));
 
-        // Theme value takes precedence over CT & default config
-        // @see https://github.com/bolt/bolt/issues/3951
-        if (!$amount = $this->app['config']->get('theme/listing_records', false)) {
-            $amount = empty($contenttype['listing_records']) ? $this->app['config']->get('general/listing_records') : $contenttype['listing_records'];
-        }
-        if (!$order = $this->app['config']->get('theme/listing_sort', false)) {
-            $order = empty($contenttype['sort']) ? null : $contenttype['sort'];
-        }
-        // If $order is not set, one of two things can happen: Either we let `getContent()` sort by itself, or we
-        // explicitly set it to sort on the general/listing_sort setting.
-        if ($order === null) {
-            $taxonomies = $this->app['config']->get('taxonomy');
-            $hassortorder = false;
-            if (!empty($contenttype['taxonomy'])) {
-                foreach ($contenttype['taxonomy'] as $contenttypetaxonomy) {
-                    if ($taxonomies[$contenttypetaxonomy]['has_sortorder']) {
-                        // We have a taxonomy with a sortorder, so we must keep $order = false, in order
-                        // to let `getContent()` handle it. We skip the fallback that's a few lines below.
-                        $hassortorder = true;
-                    }
-                }
-            }
-            if (!$hassortorder) {
-                $order = $this->app['config']->get('general/listing_sort');
-            }
-        }
+//        // Theme value takes precedence over CT & default config
+//        // @see https://github.com/bolt/bolt/issues/3951
+//        if (!$amount = $app['config']->get('theme/listing_records', false)) {
+//            $amount = empty($contenttype['listing_records']) ? $app['config']->get('general/listing_records') : $contenttype['listing_records'];
+//        }
+//        if (!$order = $app['config']->get('theme/listing_sort', false)) {
+//            $order = empty($contenttype['sort']) ? null : $contenttype['sort'];
+//        }
+//        // If $order is not set, one of two things can happen: Either we let `getContent()` sort by itself, or we
+//        // explicitly set it to sort on the general/listing_sort setting.
+//        if ($order === null) {
+//            $taxonomies = $app['config']->get('taxonomy');
+//            $hassortorder = false;
+//            if (!empty($contenttype['taxonomy'])) {
+//                foreach ($contenttype['taxonomy'] as $contenttypetaxonomy) {
+//                    if ($taxonomies[$contenttypetaxonomy]['has_sortorder']) {
+//                        // We have a taxonomy with a sortorder, so we must keep $order = false, in order
+//                        // to let `getContent()` handle it. We skip the fallback that's a few lines below.
+//                        $hassortorder = true;
+//                    }
+//                }
+//            }
+//            if (!$hassortorder) {
+//                $order = $app['config']->get('general/listing_sort');
+//            }
+//        }
 
-        $content = $this->app['storage']->getContent($contenttype['slug'], ['limit' => $amount, 'order' => $order, 'page' => $page, 'paging' => true]);
+        $content = $app['storage']->getContent($contenttype['slug'], ['limit' => $amount, 'order' => $order, 'page' => $page, 'paging' => true]);
 
         return $content;
     }
@@ -207,9 +225,9 @@ class WordpressThemeExtension extends SimpleExtension
     {
         $data = [];
 
-        $this->app['twig.loader.filesystem']->addPath(__DIR__);
+        $app['twig.loader.filesystem']->addPath(__DIR__);
 
-        return $this->app['twig']->render('wp-theme-templates/dashboard.twig', $data);
+        return $app['twig']->render('wp-theme-templates/dashboard.twig', $data);
 
     }
 
@@ -221,7 +239,7 @@ class WordpressThemeExtension extends SimpleExtension
 
         $this->loadWPCruft();
 
-        $customize = new WPcustomize($this->app);
+        $customize = new WPcustomize($app);
 
         do_action('customize_register', $customize);
 
@@ -230,7 +248,7 @@ class WordpressThemeExtension extends SimpleExtension
         $data['output'] = $customize->getYaml();
 
         $data['text'] = "The following configuration file was generated automatically from the <tt>" .
-            $this->app['config']->get('general/theme') .
+            $app['config']->get('general/theme') .
             "</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
         // dump($data);
 
@@ -240,9 +258,9 @@ class WordpressThemeExtension extends SimpleExtension
             echo "File not saved!";
         }
 
-        $this->app['twig.loader.filesystem']->addPath(__DIR__);
+        $app['twig.loader.filesystem']->addPath(__DIR__);
 
-        return $this->app['twig']->render('wp-theme-templates/dashboard.twig', $data);
+        return $app['twig']->render('wp-theme-templates/dashboard.twig', $data);
 
     }
 

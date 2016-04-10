@@ -1206,7 +1206,7 @@ function dynamic_sidebar($index = 1) {
 		}
 	}
 
-    echo Bolt\Extension\Bobdenotter\WPTheme\WPhelper::render('wp-twighelpers/dynamic_sidebar.twig', [ 'index' => $index ]);
+    echo Bolt\Extension\Bobdenotter\WordpressTheme\WordpressHelper::render('wp-twighelpers/dynamic_sidebar.twig', [ 'index' => $index ]);
 
 	$sidebars_widgets = wp_get_sidebars_widgets();
 	if ( empty( $wp_registered_sidebars[ $index ] ) || empty( $sidebars_widgets[ $index ] ) || ! is_array( $sidebars_widgets[ $index ] ) ) {
@@ -1434,7 +1434,7 @@ function is_active_sidebar( $index ) {
 
 	$index = ( is_int($index) ) ? "sidebar-$index" : sanitize_title($index);
 	// Modified for Bolt.
-    $hasWidgets = Bolt\Extension\Bobdenotter\WPTheme\WPhelper::render('wp-twighelpers/is_active_sidebar.twig', [ 'index' => $index ]);
+    $hasWidgets = Bolt\Extension\Bobdenotter\WordpressTheme\WordpressHelper::render('wp-twighelpers/is_active_sidebar.twig', [ 'index' => $index ]);
 
 	$is_active_sidebar = ! empty( $hasWidgets );
 

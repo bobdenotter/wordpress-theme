@@ -117,6 +117,10 @@ class WordpressThemeExtension extends SimpleExtension
 
     public function record($contenttypeslug, $slug = '')
     {
+        // TODO: Figure out why `$this->getContainer` doesn't work.
+        // $app = $this->getContainer();
+        $app = ResourceManager::getApp();
+
         $contenttype = $app['storage']->getContentType($contenttypeslug);
 
         // If the contenttype is 'viewless', don't show the record page.
@@ -162,8 +166,6 @@ class WordpressThemeExtension extends SimpleExtension
         }
 
         ob_start();
-        dump(getcwd());
-        dump($templatefile);
         require_once($templatefile);
 
         do_action('wp_enqueue_scripts');

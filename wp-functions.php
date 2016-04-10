@@ -180,7 +180,7 @@ function body_class( $class = '' ) {
  * @return array Array of classes.
  */
 function get_body_class( $class = '' ) {
-    global $wp_query, $wpdb;
+    global $wp_query, $wpdb, $post;
 
     $classes = array();
 
@@ -207,8 +207,8 @@ function get_body_class( $class = '' ) {
         $classes[] = 'error404';
 
     if ( is_single() ) {
-        $post_id = $wp_query->get_queried_object_id();
-        $post = $wp_query->get_queried_object();
+        $post_id = $post['id'];
+        $post = $post['values'];
 
         $classes[] = 'single';
         if ( isset( $post->post_type ) ) {
@@ -1001,8 +1001,8 @@ function comments_open()
 {
     global $app;
 
-    $enabled = array_keys($app['extensions']->getEnabled());
-    $needed = ['Disqus', 'Facebook Comments'];
+    $enabled = array_keys($app['extensions']->all());
+    $needed = ['Bolt/Disqus', 'Bolt/FacebookComments'];
 
     return (!empty(array_intersect($needed, $enabled)));
 }

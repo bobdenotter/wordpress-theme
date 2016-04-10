@@ -16,7 +16,7 @@ class WordpressHelper {
      * Print out a stub for an un-implemented function
      *
      */
-    public function stub($functionname, $arguments)
+    static function stub($functionname, $arguments)
     {
 
         $arguments = self::printParameters($arguments);
@@ -29,7 +29,7 @@ class WordpressHelper {
         echo " <mark>{$functionname}({$arguments})</mark> ";
     }
 
-    public function printParameters($parameters = array())
+    static function printParameters($parameters = array())
     {
         if (empty($parameters)) {
             return;
@@ -50,7 +50,7 @@ class WordpressHelper {
     }
 
 
-    public function render($template, $data = [])
+    static function render($template, $data = [])
     {
         $app = ResourceManager::getApp();
 
@@ -60,7 +60,7 @@ class WordpressHelper {
     }
 
 
-    public function enqueueScript($handle, $src = false, $deps = array(), $ver = false, $in_footer = false )
+    static function enqueueScript($handle, $src = false, $deps = array(), $ver = false, $in_footer = false )
     {
         if (!is_array(self::$scriptQueue)) {
             self::$scriptQueue = [
@@ -87,7 +87,7 @@ class WordpressHelper {
             $app = ResourceManager::getApp();
 
             $jqueryfile = $app['paths']['extensions'] . basename(dirname(dirname(__DIR__))) . '/' .
-                    basename(dirname(__DIR__)) . '/wp-theme/assets/jquery-2.1.4.min.js';
+                    basename(dirname(__DIR__)) . '/wp-theme/assets/jquery-2.2.3.min.js';
             self::enqueueScript('jquery', $jqueryfile);
         }
 
@@ -95,7 +95,7 @@ class WordpressHelper {
 
 
 
-    public function enqueueStyleSheet($handle, $src = false, $deps = array(), $ver = false, $media = 'all' )
+    static function enqueueStyleSheet($handle, $src = false, $deps = array(), $ver = false, $media = 'all' )
     {
         if (!is_array(self::$cssQueue)) {
             self::$cssQueue = [];
@@ -114,7 +114,7 @@ class WordpressHelper {
 
 
 
-    public function enqueueInlineStyle($handle, $data = false)
+    static function enqueueInlineStyle($handle, $data = false)
     {
         if (!is_array(self::$cssQueue)) {
             self::$cssQueue = [];
@@ -127,7 +127,7 @@ class WordpressHelper {
     }
 
 
-    public function addStyleData($handle, $key, $value)
+    static function addStyleData($handle, $key, $value)
     {
         if (empty(self::$cssQueue[$handle])) {
             return;
@@ -176,7 +176,7 @@ class WordpressHelper {
      *
      * @return string
      */
-    public function insertAfterMeta($tag, $html)
+    static function insertAfterMeta($tag, $html)
     {
         // first, attempt to insert it after the last meta tag, matching indentation.
         if (preg_match_all("~^([ \t]*)<meta (.*)~mi", $html, $matches)) {
@@ -201,7 +201,7 @@ class WordpressHelper {
      *
      * @return string
      */
-    public function insertEndOfHead($tag, $html)
+    static function insertEndOfHead($tag, $html)
     {
         // first, attempt to insert it before the </head> tag, matching indentation.
         if (preg_match("~([ \t]*)</head~mi", $html, $matches)) {
@@ -227,7 +227,7 @@ class WordpressHelper {
      *
      * @return string
      */
-    public function insertEndOfBody($tag, $html)
+    static function insertEndOfBody($tag, $html)
     {
         // first, attempt to insert it before the </body> tag, matching indentation.
         if (preg_match("~([ \t]*)</body~mi", $html, $matches)) {

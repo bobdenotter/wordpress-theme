@@ -646,9 +646,20 @@ function __($label, $domain = 'default' )
 /**
  * Stub for has_nav_menu.
  */
-function has_nav_menu()
+function has_nav_menu($name)
 {
-    WordpressHelper::stub('has_nav_menu', func_get_args());
+    global $app;
+
+    if ($name == 'primary' && ($app['config']->get('menu/primary') == null)) {
+        $name = 'main';
+    }
+
+    // If we have a menu..
+    if ($app['config']->get('menu/' . $name) != null) {
+        return true;
+    }
+
+    echo "<!-- WordpressTheme: No menu for $name -->";
 }
 
 /**
@@ -658,15 +669,14 @@ function wp_nav_menu($args)
 {
     global $app;
 
-    // If we have only one menu defined, we should just use that, regardless of the passed-in 'theme_location'
-    $boltmenu = $app['config']->get('menu');
-
-    if (count($boltmenu) == 1) {
-        $args['theme_location'] = key($boltmenu);
+    if ($args['theme_location'] == 'primary' && ($app['config']->get('menu/primary') == null)) {
+        $args['theme_location'] = 'main';
     }
 
-    echo WordpressHelper::render('wp-twighelpers/wp_nav_menu.twig', ['args' => $args ]);
-
+    // If we have a menu..
+    if ($app['config']->get('menu/' . $args['theme_location']) != null) {
+        echo WordpressHelper::render('wp-twighelpers/wp_nav_menu.twig', ['args' => $args]);
+    }
 }
 
 /**

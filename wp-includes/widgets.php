@@ -1431,10 +1431,11 @@ function is_dynamic_sidebar() {
  * @return bool true if the sidebar is in use, false otherwise.
  */
 function is_active_sidebar( $index ) {
+	global $app;
 
 	$index = ( is_int($index) ) ? "sidebar-$index" : sanitize_title($index);
 	// Modified for Bolt.
-    $hasWidgets = Bolt\Extension\Bobdenotter\WordpressTheme\WordpressHelper::render('wp-twighelpers/is_active_sidebar.twig', [ 'index' => $index ]);
+    $hasWidgets = $app['asset.queue.widget']->hasItemsInQueue($index);
 
 	$is_active_sidebar = ! empty( $hasWidgets );
 

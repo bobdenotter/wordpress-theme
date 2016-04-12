@@ -64,6 +64,7 @@ class WordpressThemeExtension extends SimpleExtension
         require_once($dirname . 'theme.php');
         require_once($dirname . 'class-wp-error.php');
         require_once($dirname . 'class-wp-theme.php');
+        require_once($dirname . 'class-wp-widget.php');
         require_once($dirname . 'class-wp-customize-control.php');
 
         wp_cache_init();

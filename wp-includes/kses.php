@@ -97,6 +97,9 @@ if ( ! CUSTOM_TAGS ) {
 			'src' => true,
 		),
 		'b' => array(),
+		'bdo' => array(
+			'dir' => true,
+		),
 		'big' => array(),
 		'blockquote' => array(
 			'cite' => true,
@@ -546,7 +549,7 @@ function wp_kses_one_attr( $string, $element ) {
 	$allowed_protocols = wp_allowed_protocols();
 	$string = wp_kses_no_null( $string, array( 'slash_zero' => 'keep' ) );
 	$string = wp_kses_js_entities( $string );
-
+	
 	// Preserve leading and trailing whitespace.
 	$matches = array();
 	preg_match('/^\s*/', $string, $matches);
@@ -558,7 +561,7 @@ function wp_kses_one_attr( $string, $element ) {
 	} else {
 		$string = substr( $string, strlen( $lead ), -strlen( $trail ) );
 	}
-
+	
 	// Parse attribute name and value from input.
 	$split = preg_split( '/\s*=\s*/', $string, 2 );
 	$name = $split[0];
@@ -595,7 +598,7 @@ function wp_kses_one_attr( $string, $element ) {
 		$value = '';
 		$vless = 'y';
 	}
-
+	
 	// Sanitize attribute by name.
 	wp_kses_attr_check( $name, $value, $string, $vless, $element, $allowed_html );
 
@@ -1058,7 +1061,7 @@ function wp_kses_attr_parse( $element ) {
 	} else {
 		$xhtml_slash = '';
 	}
-
+	
 	// Split it
 	$attrarr = wp_kses_hair_parse( $attr );
 	if ( false === $attrarr ) {
@@ -1068,7 +1071,7 @@ function wp_kses_attr_parse( $element ) {
 	// Make sure all input is returned by adding front and back matter.
 	array_unshift( $attrarr, $begin . $slash . $elname );
 	array_push( $attrarr, $xhtml_slash . $end );
-
+	
 	return $attrarr;
 }
 
@@ -1578,6 +1581,19 @@ function wp_kses_post( $data ) {
 }
 
 /**
+ * Navigates through an array, object, or scalar, and sanitizes content for
+ * allowed HTML tags for post content.
+ *
+ * @since 4.4.2
+ *
+ * @param mixed $value The array or string to filter.
+ * @return mixed $value The filtered content.
+ */
+function wp_kses_post_deep( $data ) {
+	return map_deep( $data, 'wp_kses_post' );
+}
+
+/**
  * Strips all of the HTML in the content.
  *
  * @since 2.1.0
@@ -1694,10 +1710,10 @@ function safecss_filter_attr( $css, $deprecated = '' ) {
 	'border-right-style', 'border-right-width', 'border-spacing', 'border-style', 'border-top',
 	'border-top-color', 'border-top-style', 'border-top-width', 'border-width', 'caption-side',
 	'clear', 'cursor', 'direction', 'font', 'font-family', 'font-size', 'font-style',
-	'font-variant', 'font-weight', 'height', 'letter-spacing', 'line-height', 'margin-bottom',
+	'font-variant', 'font-weight', 'height', 'min-height','max-height' , 'letter-spacing', 'line-height', 'margin-bottom',
 	'margin-left', 'margin-right', 'margin-top', 'overflow', 'padding', 'padding-bottom',
 	'padding-left', 'padding-right', 'padding-top', 'text-decoration', 'text-indent', 'vertical-align',
-	'width' ) );
+	'width', 'min-width', 'max-width' ) );
 
 	if ( empty($allowed_attr) )
 		return $css;

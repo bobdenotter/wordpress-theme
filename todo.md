@@ -9,8 +9,7 @@ Todo's:
     $defaults['logo_header_text'] = __('Call me! Maybe?', 'vantage');
 
 Added 2016-04-10:
- - How to "trigger" copying of assets from assets/ folder to public/
- - http://wptheme.localhost/extensions/bobdenotter/Wordpress-theme/Wordpress-theme/assets/jquery-2.2.3.min.js < does that name make sense?
+ - How to "trigger" copying of assets from assets/ folder to public/ ?
 
 Added 2016-04-12:
  - Discrepency

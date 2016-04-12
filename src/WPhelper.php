@@ -86,8 +86,12 @@ class WordpressHelper {
         if (in_array('jquery', $deps)) {
             $app = ResourceManager::getApp();
 
-            $jqueryfile = $app['paths']['extensions'] . basename(dirname(dirname(__DIR__))) . '/' .
-                    basename(dirname(__DIR__)) . '/wordpress-theme/assets/jquery-2.2.3.min.js';
+            $jqueryfile = sprintf(
+                '%s%s/%s/wordpress-theme/assets/jquery-2.2.3.min.js',
+                $app['paths']['extensions'],
+                basename(dirname(dirname(dirname(__DIR__)))),
+                basename(dirname(dirname(__DIR__)))
+            );
             self::enqueueScript('jquery', $jqueryfile);
         }
 
@@ -151,8 +155,6 @@ class WordpressHelper {
         }
 
         if (!empty(self::$scriptQueue) && !empty(self::$scriptQueue['footer'])) {
-            // dump(self::$scriptQueue['footer']);
-            // echo implode('', self::$scriptQueue['footer']);
             $html = self::insertEndOfBody(implode('', self::$scriptQueue['footer']), $html);
         }
 
@@ -164,7 +166,7 @@ class WordpressHelper {
 
     static function lowercasePDangit($html)
     {
-        return preg_replace('/WordPress/i', 'Wordpress', $html);
+        return preg_replace('/WordPress/', 'Wordpress', $html);
     }
 
 

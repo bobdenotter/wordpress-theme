@@ -77,7 +77,7 @@ posts:
 snippet for LowlevelException.php, around line 150:
 
 ```php
-            // Added for Wordpress-theme extension.
+            // Added for WordpressTheme extension.
             $match = preg_match('/Call to undefined function ([A-Za-z0-9_-]+)\(\)/i', $error['message'], $matches);
             if (!empty($matches[1])) {
                 $functionname = $matches[1];
@@ -88,17 +88,17 @@ snippet for LowlevelException.php, around line 150:
  */
 function {$functionname}()
 {
-    WPhelper::stub('{$functionname}', func_get_args());
+    WordpressHelper::stub('{$functionname}', func_get_args());
 }
 
 EOM;
-                $filename = dirname(dirname(__DIR__)) . '/extensions/local/bobdenotter/wordpress-theme/wp-functions.php';
+                $filename = dirname(dirname(dirname(dirname(dirname(__DIR__))))) .
+                    '/extensions/local/bobdenotter/wordpress-theme/wp-includes/wp-functions.php';
                 if(file_put_contents($filename, $add, FILE_APPEND)) {
-                    echo "<mark>Added $functionname !</mark>";
+                   echo "<mark>Added $functionname !</mark>";
                 }
 
             }
-            // End of added for Wordpress extension.
-
+            // End of added for WordpressTheme extension.
 
 ```

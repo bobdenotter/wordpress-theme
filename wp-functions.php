@@ -2622,3 +2622,27 @@ function is_admin_bar_showing()
 {
     return false;
 }
+
+/**
+ * Stub for esc_attr_e.
+ */
+function esc_attr_e()
+{
+    WordpressHelper::stub('esc_attr_e', func_get_args());
+}
+
+/**
+ * Stub for has_excerpt.
+ */
+function has_excerpt()
+{
+    WordpressHelper::stub('has_excerpt', func_get_args());
+}
+
+/**
+ * Stub for wp_script_add_data.
+ */
+function wp_script_add_data()
+{
+    WordpressHelper::stub('wp_script_add_data', func_get_args());
+}

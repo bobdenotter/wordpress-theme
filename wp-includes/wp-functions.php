@@ -2015,15 +2015,10 @@ function add_query_arg() {
  */
 function wp_attachment_is_image()
 {
+    return false;
+    // WordpressHelper::stub('wp_attachment_is_image', func_get_args());
 }
 
-/**
- * Stub for wp_localize_script.
- */
-function wp_localize_script()
-{
-    WordpressHelper::stub('wp_localize_script', func_get_args());
-}
 
 /**
  * Stub for get_adjacent_post.
@@ -2434,21 +2429,6 @@ function esc_attr__()
     WordpressHelper::stub('esc_attr__', func_get_args());
 }
 
-/**
- * Stub for wp_register_style.
- */
-function wp_register_style()
-{
-    WordpressHelper::stub('wp_register_style', func_get_args());
-}
-
-/**
- * Stub for wp_register_script.
- */
-function wp_register_script()
-{
-    WordpressHelper::stub('wp_register_script', func_get_args());
-}
 
 /**
  * Stub for is_author.
@@ -2629,10 +2609,58 @@ function has_excerpt()
     WordpressHelper::stub('has_excerpt', func_get_args());
 }
 
+
 /**
- * Stub for wp_script_add_data.
+ * Mark something as being incorrectly called.
+ *
+ * There is a hook doing_it_wrong_run that will be called that can be used
+ * to get the backtrace up to what file and function called the deprecated
+ * function.
+ *
+ * The current behavior is to trigger a user error if WP_DEBUG is true.
+ *
+ * @since 3.1.0
+ * @access private
+ *
+ * @param string $function The function that was called.
+ * @param string $message  A message explaining what has been done incorrectly.
+ * @param string $version  The version of WordPress where the message was added.
  */
-function wp_script_add_data()
-{
-    WordpressHelper::stub('wp_script_add_data', func_get_args());
+function _doing_it_wrong( $function, $message, $version ) {
+
+    /**
+     * Fires when the given function is being used incorrectly.
+     *
+     * @since 3.1.0
+     *
+     * @param string $function The function that was called.
+     * @param string $message  A message explaining what has been done incorrectly.
+     * @param string $version  The version of WordPress where the message was added.
+     */
+    do_action( 'doing_it_wrong_run', $function, $message, $version );
+
+    /**
+     * Filter whether to trigger an error for _doing_it_wrong() calls.
+     *
+     * @since 3.1.0
+     *
+     * @param bool $trigger Whether to trigger the error for _doing_it_wrong() calls. Default true.
+     */
+    if ( WP_DEBUG && apply_filters( 'doing_it_wrong_trigger_error', true ) ) {
+        if ( function_exists( '__' ) ) {
+            $version = is_null( $version ) ? '' : sprintf( __( '(This message was added in version %s.)' ), $version );
+            /* translators: %s: Codex URL */
+            $message .= ' ' . sprintf( __( 'Please see <a href="%s">Debugging in WordPress</a> for more information.' ),
+                    __( 'https://codex.wordpress.org/Debugging_in_WordPress' )
+                );
+            trigger_error( sprintf( __( '%1$s was called <strong>incorrectly</strong>. %2$s %3$s' ), $function, $message, $version ) );
+        } else {
+            $version = is_null( $version ) ? '' : sprintf( '(This message was added in version %s.)', $version );
+            $message .= sprintf( ' Please see <a href="%s">Debugging in WordPress</a> for more information.',
+                'https://codex.wordpress.org/Debugging_in_WordPress'
+            );
+            trigger_error( sprintf( '%1$s was called <strong>incorrectly</strong>. %2$s %3$s', $function, $message, $version ) );
+        }
+    }
 }
+

@@ -13,23 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class WordpressThemeExtension extends SimpleExtension
 {
-
-    // public function initialize()
-    // {
-    //     $end = $app['config']->getWhichEnd();
-
-    //     if ($end =='frontend') {
-    //         $this->loadWPCruft();
-    //     }
-
-    //     $root = $app['resources']->getUrl('bolt');
-    //     $this->addMenuOption('WP Theme', $root . 'wp-theme', 'fa:wordpress');
-    //     $app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
-    //     $app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
-
-    // }
-
-
     protected function registerMenuEntries()
     {
         $menu = new MenuEntry('wptheme-menu', 'wptheme-settings');
@@ -46,7 +29,8 @@ class WordpressThemeExtension extends SimpleExtension
     protected function registerBackendRoutes(ControllerCollection $collection)
     {
         // GET requests on the /bolt/koala route
-        $collection->get('/extend/wptheme-settings', 'wpThemeDashboard');
+        $collection->get('/extend/wptheme-settings', 'wpThemeDashboard')->bind('wpThemeDashboard');;
+        $collection->get('/extend/wptheme-gather', 'wpThemeGatherSettings')->bind('wpThemeGatherSettings');
 
     }
 
@@ -57,16 +41,11 @@ class WordpressThemeExtension extends SimpleExtension
         $route = $request->get('_route');
 
         if (substr($route, 0, 3) === 'wp-') {
-
             if (file_exists('functions.php')) {
-
                 require_once('functions.php');
             }
-
             $GLOBALS['request'] = $request;
         }
-
-
     }
 
     public function after()
@@ -84,6 +63,7 @@ class WordpressThemeExtension extends SimpleExtension
         require_once($dirname . 'formatting.php');
         require_once($dirname . 'widgets.php');
         require_once($dirname . 'theme.php');
+        require_once($dirname . 'script-loader.php');
         require_once($dirname . 'class-wp-error.php');
         require_once($dirname . 'class-wp-theme.php');
         require_once($dirname . 'class-wp-widget.php');
@@ -251,21 +231,20 @@ class WordpressThemeExtension extends SimpleExtension
     {
         $data = [];
 
-        $app['twig.loader.filesystem']->addPath(__DIR__);
-
-        return $app['twig']->render('wp-theme-templates/dashboard.twig', $data);
-
+        return $this->renderTemplate('dashboard.twig', $data);
     }
 
     public function wpThemeGatherSettings(Request $request)
     {
         global $wp_filter;
 
+        $app = $this->getContainer();
+
         $data = [];
 
         $this->loadWPCruft();
 
-        $customize = new WPcustomize($app);
+        $customize = new WordpressCustomize($app);
 
         do_action('customize_register', $customize);
 
@@ -284,10 +263,7 @@ class WordpressThemeExtension extends SimpleExtension
             echo "File not saved!";
         }
 
-        $app['twig.loader.filesystem']->addPath(__DIR__);
-
-        return $app['twig']->render('wp-theme-templates/dashboard.twig', $data);
-
+        return $this->renderTemplate('dashboard.twig', $data);
     }
 
 }

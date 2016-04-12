@@ -1,6 +1,6 @@
 <?php
 
-namespace Bolt\Extension\Bobdenotter\WPTheme;
+namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
 use Bolt\Configuration\ResourceManager;
 use Bolt\Helpers\Str;
@@ -8,7 +8,7 @@ use Cocur\Slugify\Slugify;
 use Symfony\Component\Filesystem\Exception\IOException;
 use Symfony\Component\Filesystem\Filesystem;
 
-class WPcustomize {
+class WordpressCustomize {
 
     public static $markCssOutputted;
 

@@ -968,8 +968,6 @@ function get_post_type()
     }
 
     return $post->contenttype['singular_slug'];
-
-    //WordpressHelper::stub('get_post_type', func_get_args());
 }
 
 /**
@@ -2017,7 +2015,6 @@ function add_query_arg() {
  */
 function wp_attachment_is_image()
 {
-    WordpressHelper::stub('wp_attachment_is_image', func_get_args());
 }
 
 /**
@@ -2161,13 +2158,6 @@ function get_post_custom()
     WordpressHelper::stub('get_post_custom', func_get_args());
 }
 
-/**
- * Stub for get_children.
- */
-function get_children()
-{
-    WordpressHelper::stub('get_children', func_get_args());
-}
 
 /**
  * Stub for the_time.

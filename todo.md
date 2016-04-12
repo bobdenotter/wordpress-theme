@@ -12,7 +12,10 @@ Added 2016-04-10:
  - How to "trigger" copying of assets from assets/ folder to public/
  - http://wptheme.localhost/extensions/bobdenotter/Wordpress-theme/Wordpress-theme/assets/jquery-2.2.3.min.js < does that name make sense?
 
-
+Added 2016-04-12:
+ - Discrepency
+        $menu = new MenuEntry('wptheme-menu', 'wptheme-settings');
+        $collection->get('/extend/wptheme-settings', 'wpThemeDashboard');
 
 
 -------

@@ -2,29 +2,51 @@
 
 namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
+
 use Bolt\Configuration\ResourceManager;
 use Bolt\Extension\SimpleExtension;
-
-//use Bolt\Pager;
+use Bolt\Menu\MenuEntry;
 use Bolt\Pager\Pager;
+use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
 
 
 class WordpressThemeExtension extends SimpleExtension
 {
 
-    public function initialize()
+    // public function initialize()
+    // {
+    //     $end = $app['config']->getWhichEnd();
+
+    //     if ($end =='frontend') {
+    //         $this->loadWPCruft();
+    //     }
+
+    //     $root = $app['resources']->getUrl('bolt');
+    //     $this->addMenuOption('WP Theme', $root . 'wp-theme', 'fa:wordpress');
+    //     $app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
+    //     $app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
+
+    // }
+
+
+    protected function registerMenuEntries()
     {
-        $end = $app['config']->getWhichEnd();
+        $menu = new MenuEntry('wptheme-menu', 'wptheme-settings');
+        $menu->setLabel('WordpressTheme Settings')
+            ->setIcon('fa:wordpress')
+            ->setPermission('settings')
+        ;
 
-        if ($end =='frontend') {
-            $this->loadWPCruft();
-        }
+        return [
+            $menu,
+        ];
+    }
 
-        $root = $app['resources']->getUrl('bolt');
-        $this->addMenuOption('WP Theme', $root . 'wp-theme', 'fa:wordpress');
-        $app->get($root . 'wp-theme', array($this, 'wpThemeDashboard'))->bind('wpThemeDashboard');
-        $app->get($root . 'wp-theme/gather', array($this, 'wpThemeGatherSettings'))->bind('wpThemeGatherSettings');
+    protected function registerBackendRoutes(ControllerCollection $collection)
+    {
+        // GET requests on the /bolt/koala route
+        $collection->get('/extend/wptheme-settings', 'wpThemeDashboard');
 
     }
 

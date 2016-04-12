@@ -2664,3 +2664,263 @@ function _doing_it_wrong( $function, $message, $version ) {
     }
 }
 
+
+
+/**
+ * Encode a variable into JSON, with some sanity checks.
+ *
+ * @since 4.1.0
+ *
+ * @param mixed $data    Variable (usually an array or object) to encode as JSON.
+ * @param int   $options Optional. Options to be passed to json_encode(). Default 0.
+ * @param int   $depth   Optional. Maximum depth to walk through $data. Must be
+ *                       greater than 0. Default 512.
+ * @return string|false The JSON encoded string, or false if it cannot be encoded.
+ */
+function wp_json_encode( $data, $options = 0, $depth = 512 ) {
+    /*
+     * json_encode() has had extra params added over the years.
+     * $options was added in 5.3, and $depth in 5.5.
+     * We need to make sure we call it with the correct arguments.
+     */
+    if ( version_compare( PHP_VERSION, '5.5', '>=' ) ) {
+        $args = array( $data, $options, $depth );
+    } elseif ( version_compare( PHP_VERSION, '5.3', '>=' ) ) {
+        $args = array( $data, $options );
+    } else {
+        $args = array( $data );
+    }
+
+    // Prepare the data for JSON serialization.
+    $data = _wp_json_prepare_data( $data );
+
+    $json = @call_user_func_array( 'json_encode', $args );
+
+    // If json_encode() was successful, no need to do more sanity checking.
+    // ... unless we're in an old version of PHP, and json_encode() returned
+    // a string containing 'null'. Then we need to do more sanity checking.
+    if ( false !== $json && ( version_compare( PHP_VERSION, '5.5', '>=' ) || false === strpos( $json, 'null' ) ) )  {
+        return $json;
+    }
+
+    try {
+        $args[0] = _wp_json_sanity_check( $data, $depth );
+    } catch ( Exception $e ) {
+        return false;
+    }
+
+    return call_user_func_array( 'json_encode', $args );
+}
+
+/**
+ * Perform sanity checks on data that shall be encoded to JSON.
+ *
+ * @ignore
+ * @since 4.1.0
+ * @access private
+ *
+ * @see wp_json_encode()
+ *
+ * @param mixed $data  Variable (usually an array or object) to encode as JSON.
+ * @param int   $depth Maximum depth to walk through $data. Must be greater than 0.
+ * @return mixed The sanitized data that shall be encoded to JSON.
+ */
+function _wp_json_sanity_check( $data, $depth ) {
+    if ( $depth < 0 ) {
+        throw new Exception( 'Reached depth limit' );
+    }
+
+    if ( is_array( $data ) ) {
+        $output = array();
+        foreach ( $data as $id => $el ) {
+            // Don't forget to sanitize the ID!
+            if ( is_string( $id ) ) {
+                $clean_id = _wp_json_convert_string( $id );
+            } else {
+                $clean_id = $id;
+            }
+
+            // Check the element type, so that we're only recursing if we really have to.
+            if ( is_array( $el ) || is_object( $el ) ) {
+                $output[ $clean_id ] = _wp_json_sanity_check( $el, $depth - 1 );
+            } elseif ( is_string( $el ) ) {
+                $output[ $clean_id ] = _wp_json_convert_string( $el );
+            } else {
+                $output[ $clean_id ] = $el;
+            }
+        }
+    } elseif ( is_object( $data ) ) {
+        $output = new stdClass;
+        foreach ( $data as $id => $el ) {
+            if ( is_string( $id ) ) {
+                $clean_id = _wp_json_convert_string( $id );
+            } else {
+                $clean_id = $id;
+            }
+
+            if ( is_array( $el ) || is_object( $el ) ) {
+                $output->$clean_id = _wp_json_sanity_check( $el, $depth - 1 );
+            } elseif ( is_string( $el ) ) {
+                $output->$clean_id = _wp_json_convert_string( $el );
+            } else {
+                $output->$clean_id = $el;
+            }
+        }
+    } elseif ( is_string( $data ) ) {
+        return _wp_json_convert_string( $data );
+    } else {
+        return $data;
+    }
+
+    return $output;
+}
+
+/**
+ * Convert a string to UTF-8, so that it can be safely encoded to JSON.
+ *
+ * @ignore
+ * @since 4.1.0
+ * @access private
+ *
+ * @see _wp_json_sanity_check()
+ *
+ * @staticvar bool $use_mb
+ *
+ * @param string $string The string which is to be converted.
+ * @return string The checked string.
+ */
+function _wp_json_convert_string( $string ) {
+    static $use_mb = null;
+    if ( is_null( $use_mb ) ) {
+        $use_mb = function_exists( 'mb_convert_encoding' );
+    }
+
+    if ( $use_mb ) {
+        $encoding = mb_detect_encoding( $string, mb_detect_order(), true );
+        if ( $encoding ) {
+            return mb_convert_encoding( $string, 'UTF-8', $encoding );
+        } else {
+            return mb_convert_encoding( $string, 'UTF-8', 'UTF-8' );
+        }
+    } else {
+        return wp_check_invalid_utf8( $string, true );
+    }
+}
+
+/**
+ * Prepares response data to be serialized to JSON.
+ *
+ * This supports the JsonSerializable interface for PHP 5.2-5.3 as well.
+ *
+ * @ignore
+ * @since 4.4.0
+ * @access private
+ *
+ * @param mixed $data Native representation.
+ * @return bool|int|float|null|string|array Data ready for `json_encode()`.
+ */
+function _wp_json_prepare_data( $data ) {
+    if ( ! defined( 'WP_JSON_SERIALIZE_COMPATIBLE' ) || WP_JSON_SERIALIZE_COMPATIBLE === false ) {
+        return $data;
+    }
+
+    switch ( gettype( $data ) ) {
+        case 'boolean':
+        case 'integer':
+        case 'double':
+        case 'string':
+        case 'NULL':
+            // These values can be passed through.
+            return $data;
+
+        case 'array':
+            // Arrays must be mapped in case they also return objects.
+            return array_map( '_wp_json_prepare_data', $data );
+
+        case 'object':
+            // If this is an incomplete object (__PHP_Incomplete_Class), bail.
+            if ( ! is_object( $data ) ) {
+                return null;
+            }
+
+            if ( $data instanceof JsonSerializable ) {
+                $data = $data->jsonSerialize();
+            } else {
+                $data = get_object_vars( $data );
+            }
+
+            // Now, pass the array (or whatever was returned from jsonSerialize through).
+            return _wp_json_prepare_data( $data );
+
+        default:
+            return null;
+    }
+}
+
+/**
+ * Send a JSON response back to an Ajax request.
+ *
+ * @since 3.5.0
+ *
+ * @param mixed $response Variable (usually an array or object) to encode as JSON,
+ *                        then print and die.
+ */
+function wp_send_json( $response ) {
+    @header( 'Content-Type: application/json; charset=' . get_option( 'blog_charset' ) );
+    echo wp_json_encode( $response );
+    if ( defined( 'DOING_AJAX' ) && DOING_AJAX )
+        wp_die();
+    else
+        die;
+}
+
+/**
+ * Send a JSON response back to an Ajax request, indicating success.
+ *
+ * @since 3.5.0
+ *
+ * @param mixed $data Data to encode as JSON, then print and die.
+ */
+function wp_send_json_success( $data = null ) {
+    $response = array( 'success' => true );
+
+    if ( isset( $data ) )
+        $response['data'] = $data;
+
+    wp_send_json( $response );
+}
+
+/**
+ * Send a JSON response back to an Ajax request, indicating failure.
+ *
+ * If the `$data` parameter is a {@see WP_Error} object, the errors
+ * within the object are processed and output as an array of error
+ * codes and corresponding messages. All other types are output
+ * without further processing.
+ *
+ * @since 3.5.0
+ * @since 4.1.0 The `$data` parameter is now processed if a {@see WP_Error}
+ *              object is passed in.
+ *
+ * @param mixed $data Data to encode as JSON, then print and die.
+ */
+function wp_send_json_error( $data = null ) {
+    $response = array( 'success' => false );
+
+    if ( isset( $data ) ) {
+        if ( is_wp_error( $data ) ) {
+            $result = array();
+            foreach ( $data->errors as $code => $messages ) {
+                foreach ( $messages as $message ) {
+                    $result[] = array( 'code' => $code, 'message' => $message );
+                }
+            }
+
+            $response['data'] = $result;
+        } else {
+            $response['data'] = $data;
+        }
+    }
+
+    wp_send_json( $response );
+}

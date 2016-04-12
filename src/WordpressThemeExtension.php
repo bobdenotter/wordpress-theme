@@ -171,7 +171,7 @@ class WordpressThemeExtension extends SimpleExtension
 
         ob_start();
         require_once($templatefile);
-
+        wp_scripts();
         do_action('wp_enqueue_scripts');
 
         $html = ob_get_clean();

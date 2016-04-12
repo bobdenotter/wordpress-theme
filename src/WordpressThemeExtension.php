@@ -54,16 +54,17 @@ class WordpressThemeExtension extends SimpleExtension
 
     public function loadWPCruft()
     {
-        require_once(dirname(__DIR__) . '/wp-functions.php');
-        require_once(dirname(__DIR__) . '/wp-plugin.php');
-        require_once(dirname(__DIR__) . '/wp-includes/cache.php');
-        require_once(dirname(__DIR__) . '/wp-includes/kses.php');
-        require_once(dirname(__DIR__) . '/wp-includes/formatting.php');
-        require_once(dirname(__DIR__) . '/wp-includes/widgets.php');
-        require_once(dirname(__DIR__) . '/wp-includes/theme.php');
-        require_once(dirname(__DIR__) . '/wp-includes/class-wp-error.php');
-        require_once(dirname(__DIR__) . '/wp-includes/class-wp-theme.php');
-        require_once(dirname(__DIR__) . '/wp-includes/class-wp-customize-control.php');
+        $dirname = dirname(__DIR__) . '/wp-includes/';
+        require_once($dirname . 'wp-functions.php');
+        require_once($dirname . 'wp-plugin.php');
+        require_once($dirname . 'cache.php');
+        require_once($dirname . 'kses.php');
+        require_once($dirname . 'formatting.php');
+        require_once($dirname . 'widgets.php');
+        require_once($dirname . 'theme.php');
+        require_once($dirname . 'class-wp-error.php');
+        require_once($dirname . 'class-wp-theme.php');
+        require_once($dirname . 'class-wp-customize-control.php');
 
         wp_cache_init();
 

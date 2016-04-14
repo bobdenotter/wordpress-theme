@@ -2,14 +2,10 @@
 
 namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
-
 use Bolt\Configuration\ResourceManager;
 use Bolt\Extension\SimpleExtension;
 use Bolt\Menu\MenuEntry;
-use Bolt\Pager\Pager;
-use Silex\ControllerCollection;
 use Symfony\Component\HttpFoundation\Request;
-
 
 class WordpressThemeExtension extends SimpleExtension
 {
@@ -26,12 +22,23 @@ class WordpressThemeExtension extends SimpleExtension
         ];
     }
 
-    protected function registerBackendRoutes(ControllerCollection $collection)
+    protected function registerBackendControllers()
     {
-        // GET requests on the /bolt/koala route
-        $collection->get('/extend/wptheme-settings', 'wpThemeDashboard')->bind('wpThemeDashboard');;
-        $collection->get('/extend/wptheme-gather', 'wpThemeGatherSettings')->bind('wpThemeGatherSettings');
+        $controllers = new WordpressThemeBackendControllers();
+        $controllers->setExtension($this);
 
+        return [
+            '/extend' => $controllers,
+        ];
+    }
+
+
+
+    protected function registerTwigPaths()
+    {
+        return [
+            'templates',
+        ];
     }
 
     public function before(Request $request)
@@ -224,46 +231,6 @@ class WordpressThemeExtension extends SimpleExtension
         $content = $app['storage']->getContent($contenttype['slug'], ['limit' => $amount, 'order' => $order, 'page' => $page, 'paging' => true]);
 
         return $content;
-    }
-
-
-    public function wpThemeDashboard(Request $request)
-    {
-        $data = [];
-
-        return $this->renderTemplate('dashboard.twig', $data);
-    }
-
-    public function wpThemeGatherSettings(Request $request)
-    {
-        global $wp_filter;
-
-        $app = $this->getContainer();
-
-        $data = [];
-
-        $this->loadWPCruft();
-
-        $customize = new WordpressCustomize($app);
-
-        do_action('customize_register', $customize);
-
-        // $customize->dumpSettings();
-
-        $data['output'] = $customize->getYaml();
-
-        $data['text'] = "The following configuration file was generated automatically from the <tt>" .
-            $app['config']->get('general/theme') .
-            "</tt> theme, and will be saved as <tt>config.yml</tt> in the theme folder.";
-        // dump($data);
-
-        $result = $customize->writeThemeYaml($data['output']);
-
-        if (!$result) {
-            echo "File not saved!";
-        }
-
-        return $this->renderTemplate('dashboard.twig', $data);
     }
 
 }

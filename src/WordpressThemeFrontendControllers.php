@@ -21,27 +21,34 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
     {
         $this->app = $app;
 
+        $requiremements = new \Bolt\Controller\Requirement($app['config']);
+
         /** @var ControllerCollection $ctr */
         $ctr = $app['controllers_factory'];
 
         $ctr->match('/', [$this, 'homepage'])->bind('wp-homepage');
 
-        // TODO: Needs requirement:
-        //     requirements:
-        //      contenttypeslug: controller.requirement:anyContentType
-        $ctr->match('/{contenttypeslug}/{slug}', [$this, 'record'])->bind('wp-record');
+        $ctr->match('/{contenttypeslug}/{slug}', [$this, 'record'])
+            ->bind('wp-record')
+            ->assert('contenttypeslug', $requiremements->anyContentType());
 
-
-        // $ctr->match('/wptheme-gather', [$this, 'wpThemeGatherSettings'])->bind('wpThemeGatherSettings');
+        $ctr->match('/{contenttypeslug}', [$this, 'listing'])
+            ->bind('wp-listing')
+            ->assert('contenttypeslug', $requiremements->pluralContentTypes());
 
         $ctr->before([$this, 'before']);
 
         return $ctr;
     }
 
+    public function setExtension($extension) {
+        $this->extension = $extension;
+    }
+
     public function before(Request $request)
     {
-        $this->extension->loadWPCruft();
+        $this->wordpressHelper = new WordpressHelper();
+        $this->wordpressHelper->loadWPCruft();
 
         $route = $request->get('_route');
 
@@ -85,11 +92,6 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         return $this->render('index.php', $globals);
     }
 
-    public function setExtension($extension) {
-        $this->extension = $extension;
-    }
-
-
     public function record($contenttypeslug, $slug = '')
     {
         // TODO: Figure out why `$this->getContainer` doesn't work.
@@ -127,10 +129,33 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
 
     }
 
+    public function listing($contenttypeslug)
+    {
+        $app = ResourceManager::getApp();
+
+        // Get the 'record' / 'records' for the homepage
+        $content = $app['storage']->getContent($app['config']->get('general/homepage'));
+
+        if (is_array($content)) {
+            $first = current($content);
+            $globals[$first->contenttype['slug']] = $content;
+        } elseif (!empty($content)) {
+            $globals['post'] = $content;
+            $globals[$content->contenttype['singular_slug']] = $content;
+        }
+
+        // We most likely also want a few 'posts'.
+        $posts = $this->getPagedRecords($contenttypeslug);
+
+        if (is_array($posts)) {
+            $globals['posts'] = $posts;
+        }
+
+        return $this->render('archive.php', $globals);
+    }
+
     private function getPagedRecords($contenttypeslug = 'posts')
     {
-        // TODO: Figure out why `$this->getContainer` doesn't work.
-        // $app = $this->getContainer();
         $app = ResourceManager::getApp();
 
         $contenttype = $app['storage']->getContentType($contenttypeslug);
@@ -171,11 +196,8 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         return $content;
     }
 
-
     private function render($templatefile, $globals = [])
     {
-        // TODO: Figure out why `$this->getContainer` doesn't work.
-        // $app = $this->getContainer();
         $app = ResourceManager::getApp();
 
         $globals['app'] = $app;
@@ -195,10 +217,6 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $html = WordpressHelper::outputQueue($html);
 
         return $html;
-
     }
-
-
-
 
 }

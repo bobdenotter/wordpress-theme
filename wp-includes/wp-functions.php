@@ -2924,3 +2924,19 @@ function wp_send_json_error( $data = null ) {
 
     wp_send_json( $response );
 }
+
+/**
+ * Stub for the_archive_title.
+ */
+function the_archive_title()
+{
+    WordpressHelper::stub('the_archive_title', func_get_args());
+}
+
+/**
+ * Stub for the_archive_description.
+ */
+function the_archive_description()
+{
+    WordpressHelper::stub('the_archive_description', func_get_args());
+}

@@ -45,8 +45,9 @@ class WordpressThemeBackendControllers implements ControllerProviderInterface
         global $wp_filter;
 
         $data = [];
-        
-        $this->extension->loadWPCruft();
+
+        $this->wordpressHelper = new WordpressHelper();
+        $this->wordpressHelper->loadWPCruft();
 
         $customize = new WordpressCustomize($this->app);
 

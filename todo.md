@@ -19,26 +19,6 @@ Added 2016-04-12:
 
 -------
 
-Example routes for `routing.yml`
-
-```
-wp-homepage:
-    path: /
-    defaults:
-        _controller: 'Bolt\Extension\Bobdenotter\WordpressTheme\WordpressThemeExtension::homepage'
-
-wp-contentlink:
-    path: /{contenttypeslug}/{slug}
-    defaults:
-        _controller: 'Bolt\Extension\Bobdenotter\WordpressTheme\WordpressThemeExtension::record'
-    requirements:
-        contenttypeslug: controller.requirement:anyContentType
-```
-
-
-
--------
-
 Example contenttype for `posts`
 
 ```

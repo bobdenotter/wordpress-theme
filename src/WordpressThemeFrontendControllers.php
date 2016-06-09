@@ -3,13 +3,13 @@
 namespace Bolt\Extension\Bobdenotter\WordpressTheme;
 
 use Bolt\Configuration\ResourceManager;
+use Bolt\Helpers\Input;
 use Silex\Application;
 use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Bolt\Helpers\Input;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-
+use utilphp\util;
 
 class WordpressThemeFrontendControllers implements ControllerProviderInterface
 {
@@ -40,6 +40,10 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $ctr->match('/{contenttypeslug}', [$this, 'listing'])
             ->bind('wp-listing')
             ->assert('contenttypeslug', $requiremements->pluralContentTypes());
+
+       $ctr->match('/{taxonomytype}/{slug}', [$this, 'taxonomy'])
+            ->bind('wp-taxonomy')
+            ->assert('taxonomytype', $requiremements->anyTaxonomyType());
 
         $ctr->before([$this, 'before']);
 
@@ -228,6 +232,62 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
     }
 
 
+public function taxonomy(Request $request, $taxonomytype, $slug)
+    {
+        $app = ResourceManager::getApp();
+
+        $taxonomy = $app['storage']->getTaxonomyType($taxonomytype);
+        // No taxonomytype, no possible content.
+        if (empty($taxonomy)) {
+            return false;
+        } else {
+            $taxonomyslug = $taxonomy['slug'];
+        }
+        // First, get some content
+        $context = $taxonomy['singular_slug'] . '_' . $slug;
+        $page = $this->app['pager']->getCurrentPage($context);
+        // Theme value takes precedence over default config @see https://github.com/bolt/bolt/issues/3951
+        $amount = $app['config']->get('theme/listing_records', false) ?: $app['config']->get('general/listing_records');
+
+        // Handle case where listing records has been override for specific taxonomy
+        if (array_key_exists('listing_records', $taxonomy) && is_int($taxonomy['listing_records'])) {
+            $amount = $taxonomy['listing_records'];
+        }
+
+        $order = $app['config']->get('theme/listing_sort', false) ?: $app['config']->get('general/listing_sort');
+        $content = $app['storage']->getContentByTaxonomy($taxonomytype, $slug, ['limit' => $amount, 'order' => $order, 'page' => $page]);
+
+        if (!$this->isTaxonomyValid($content, $slug, $taxonomy)) {
+            $this->abort(Response::HTTP_NOT_FOUND, "No slug '$slug' in taxonomy '$taxonomyslug'");
+
+            return;
+        }
+
+        $name = $slug;
+        // Look in taxonomies in 'content', to get a display value for '$slug', perhaps.
+        foreach ($content as $record) {
+            $flat = util::array_flatten($record->taxonomy);
+            $key = $this->app['resources']->getUrl('root') . $taxonomy['slug'] . '/' . $slug;
+            if (isset($flat[$key])) {
+                $name = $flat[$key];
+            }
+            $key = $this->app['resources']->getUrl('root') . $taxonomy['singular_slug'] . '/' . $slug;
+            if (isset($flat[$key])) {
+                $name = $flat[$key];
+            }
+        }
+
+        $globals = [
+            'posts'        => $content,
+            'slug'         => $name,
+            'taxonomy'     => $app['config']->get('taxonomy/' . $taxonomyslug),
+            'taxonomytype' => $taxonomyslug,
+        ];
+
+        return $this->render('archive.php', $globals);
+    }
+
+
     private function getPagedRecords($contenttypeslug = 'posts')
     {
         $app = ResourceManager::getApp();
@@ -310,6 +370,33 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $generator = $app['url_generator'];
 
         return $generator->generate($name, $params, $referenceType);
+    }
+
+    /**
+     * Check if the taxonomy is valid.
+     *
+     * @see https://github.com/bolt/bolt/pull/2310
+     *
+     * @param Content $content
+     * @param string  $slug
+     * @param array   $taxonomy
+     *
+     * @return boolean
+     */
+    protected function isTaxonomyValid($content, $slug, array $taxonomy)
+    {
+        if ($taxonomy['behaves_like'] === 'tags' && !$content) {
+            return false;
+        }
+
+        $isNotTag = in_array($taxonomy['behaves_like'], ['categories', 'grouping']);
+        $options = isset($taxonomy['options']) ? array_keys($taxonomy['options']) : [];
+        $isTax = in_array($slug, $options);
+        if ($isNotTag && !$isTax) {
+            return false;
+        }
+
+        return true;
     }
 
 }

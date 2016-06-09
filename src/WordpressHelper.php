@@ -17,19 +17,21 @@ class WordpressHelper {
         define('WPINC', '/wp-includes');
 
         $dirname = dirname(__DIR__) . '/wp-includes/';
-        require_once($dirname . 'wp-functions.php');
-        require_once($dirname . 'wp-plugin.php');
         require_once($dirname . 'cache.php');
-        require_once($dirname . 'kses.php');
-        require_once($dirname . 'formatting.php');
-        require_once($dirname . 'widgets.php');
-        require_once($dirname . 'theme.php');
-        require_once($dirname . 'script-loader.php');
+        require_once($dirname . 'class-wp-customize-control.php');
         require_once($dirname . 'class-wp-error.php');
         require_once($dirname . 'class-wp-theme.php');
+        require_once($dirname . 'class-wp-walker.php');
         require_once($dirname . 'class-wp-widget-factory.php');
         require_once($dirname . 'class-wp-widget.php');
-        require_once($dirname . 'class-wp-customize-control.php');
+        require_once($dirname . 'formatting.php');
+        require_once($dirname . 'kses.php');
+        require_once($dirname . 'nav-menu-template.php');
+        require_once($dirname . 'script-loader.php');
+        require_once($dirname . 'theme.php');
+        require_once($dirname . 'widgets.php');
+        require_once($dirname . 'wp-functions.php');
+        require_once($dirname . 'wp-plugin.php');
 
         wp_cache_init();
 

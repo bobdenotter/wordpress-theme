@@ -2956,3 +2956,83 @@ function has_category()
 {
     WordpressHelper::stub('has_category', func_get_args());
 }
+
+/**
+ * Stub for get_post_thumbnail_id.
+ */
+function get_post_thumbnail_id()
+{
+    WordpressHelper::stub('get_post_thumbnail_id', func_get_args());
+}
+
+/**
+ * Stub for get_the_category.
+ */
+function get_the_category()
+{
+    WordpressHelper::stub('get_the_category', func_get_args());
+}
+
+/**
+ * Stub for absint.
+ */
+function absint()
+{
+    WordpressHelper::stub('absint', func_get_args());
+}
+
+class WP_Query {
+
+    function have_posts() {
+        return false;
+    }
+
+    }
+
+/**
+ * Stub for wp_reset_query.
+ */
+function wp_reset_query()
+{
+    WordpressHelper::stub('wp_reset_query', func_get_args());
+}
+
+/**
+ * Stub for has_tag.
+ */
+function has_tag()
+{
+    WordpressHelper::stub('has_tag', func_get_args());
+}
+
+/**
+ * Stub for wp_is_mobile.
+ */
+function wp_is_mobile()
+{
+    WordpressHelper::stub('wp_is_mobile', func_get_args());
+}
+
+/**
+ * Stub for wp_count_posts.
+ */
+function wp_count_posts()
+{
+    WordpressHelper::stub('wp_count_posts', func_get_args());
+}
+
+/**
+ * Stub for the_excerpt.
+ */
+function the_excerpt()
+{
+    WordpressHelper::stub('the_excerpt', func_get_args());
+}
+
+/**
+ * Stub for wp_get_recent_posts.
+ */
+function wp_get_recent_posts()
+{
+    WordpressHelper::stub('wp_get_recent_posts', func_get_args());
+}

@@ -7,6 +7,9 @@ use Silex\Application;
 use Silex\ControllerCollection;
 use Silex\ControllerProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Bolt\Helpers\Input;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
 
 class WordpressThemeFrontendControllers implements ControllerProviderInterface
 {
@@ -27,6 +30,8 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $ctr = $app['controllers_factory'];
 
         $ctr->match('/', [$this, 'homepage'])->bind('wp-homepage');
+
+        $ctr->match('/search', [$this, 'search'])->bind('wp-search');
 
         $ctr->match('/{contenttypeslug}/{slug}', [$this, 'record'])
             ->bind('wp-record')
@@ -154,6 +159,75 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         return $this->render('archive.php', $globals);
     }
 
+    public function search(Request $request)
+    {
+        $app = ResourceManager::getApp();
+        $q = '';
+        $context = __FUNCTION__;
+
+        if ($request->query->has('q')) {
+            $q = $request->query->get('q');
+        } elseif ($request->query->has($context)) {
+            $q = $request->query->get($context);
+        }
+        $q = Input::cleanPostedData($q, false);
+
+        $page = $this->app['pager']->getCurrentPage($context);
+
+        // Theme value takes precedence over default config @see https://github.com/bolt/bolt/issues/3951
+        $pageSize = $app['config']->get('theme/search_results_records', false);
+        if ($pageSize === false && !$pageSize = $app['config']->get('general/search_results_records', false)) {
+            $pageSize = $app['config']->get('theme/listing_records', false) ?: $app['config']->get('general/listing_records', 10);
+        }
+
+        $offset = ($page - 1) * $pageSize;
+        $limit = $pageSize;
+
+        // set-up filters from URL
+        $filters = [];
+        foreach ($request->query->all() as $key => $value) {
+            if (strpos($key, '_') > 0) {
+                list($contenttypeslug, $field) = explode('_', $key, 2);
+                if (isset($filters[$contenttypeslug])) {
+                    $filters[$contenttypeslug][$field] = $value;
+                } else {
+                    $contenttype = $this->getContentType($contenttypeslug);
+                    if (is_array($contenttype)) {
+                        $filters[$contenttypeslug] = [
+                            $field => $value,
+                        ];
+                    }
+                }
+            }
+        }
+        if (count($filters) == 0) {
+            $filters = null;
+        }
+
+        $result = $app['storage']->searchContent($q, $contenttypes, $filters, $limit, $offset);
+
+        /** @var \Bolt\Pager\PagerManager $manager */
+        $manager = $this->app['pager'];
+        $manager
+            ->createPager($context)
+            ->setCount($result['no_of_results'])
+            ->setTotalpages(ceil($result['no_of_results'] / $pageSize))
+            ->setCurrent($page)
+            ->setShowingFrom($offset + 1)
+            ->setShowingTo($offset + count($result['results']));
+
+        $manager->setLink($this->generateUrl('search', ['q' => $q]) . '&page_search=');
+
+        $globals = [
+            'posts'      => $result['results'],
+            $context       => $result['query']['sanitized_q'],
+            'searchresult' => $result,
+        ];
+
+        return $this->render('search.php', $globals);
+    }
+
+
     private function getPagedRecords($contenttypeslug = 'posts')
     {
         $app = ResourceManager::getApp();
@@ -217,6 +291,25 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $html = WordpressHelper::outputQueue($html);
 
         return $html;
+    }
+
+    /**
+     * Shortcut for {@see UrlGeneratorInterface::generate}
+     *
+     * @param string $name          The name of the route
+     * @param array  $params        An array of parameters
+     * @param int    $referenceType The type of reference to be generated (one of the constants)
+     *
+     * @return string
+     */
+    protected function generateUrl($name, $params = [], $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH)
+    {
+        $app = ResourceManager::getApp();
+
+        /** @var UrlGeneratorInterface $generator */
+        $generator = $app['url_generator'];
+
+        return $generator->generate($name, $params, $referenceType);
     }
 
 }

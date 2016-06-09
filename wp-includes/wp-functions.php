@@ -2940,3 +2940,11 @@ function the_archive_description()
 {
     WordpressHelper::stub('the_archive_description', func_get_args());
 }
+
+/**
+ * Stub for get_search_query.
+ */
+function get_search_query()
+{
+    WordpressHelper::stub('get_search_query', func_get_args());
+}

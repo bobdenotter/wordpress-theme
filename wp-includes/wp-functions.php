@@ -2948,3 +2948,11 @@ function get_search_query()
 {
     WordpressHelper::stub('get_search_query', func_get_args());
 }
+
+/**
+ * Stub for has_category.
+ */
+function has_category()
+{
+    WordpressHelper::stub('has_category', func_get_args());
+}

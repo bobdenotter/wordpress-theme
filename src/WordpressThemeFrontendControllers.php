@@ -59,13 +59,8 @@ class WordpressThemeFrontendControllers implements ControllerProviderInterface
         $this->wordpressHelper = new WordpressHelper();
         $this->wordpressHelper->loadWPCruft();
 
-        $route = $request->get('_route');
-
-        if (substr($route, 0, 3) === 'wp-') {
-            if (file_exists('functions.php')) {
-                require_once('functions.php');
-            }
-            $GLOBALS['request'] = $request;
+        if (file_exists('functions.php')) {
+            require_once('functions.php');
         }
     }
 

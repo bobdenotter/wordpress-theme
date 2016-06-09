@@ -13,6 +13,9 @@ class WordpressHelper {
 
     public function loadWPCruft()
     {
+        define('ABSPATH', dirname(__DIR__));
+        define('WPINC', '/wp-includes');
+
         $dirname = dirname(__DIR__) . '/wp-includes/';
         require_once($dirname . 'wp-functions.php');
         require_once($dirname . 'wp-plugin.php');
@@ -24,6 +27,7 @@ class WordpressHelper {
         require_once($dirname . 'script-loader.php');
         require_once($dirname . 'class-wp-error.php');
         require_once($dirname . 'class-wp-theme.php');
+        require_once($dirname . 'class-wp-widget-factory.php');
         require_once($dirname . 'class-wp-widget.php');
         require_once($dirname . 'class-wp-customize-control.php');
 
@@ -35,6 +39,9 @@ class WordpressHelper {
 
         $GLOBALS['config'] = $app['config'];
         $GLOBALS['paths'] = $app['paths'];
+        $GLOBALS['request'] = $app['request'];
+
+        $GLOBALS['wp_widget_factory'] = new \WP_Widget_Factory();
 
         if (file_exists('functions.php')) {
             require_once('functions.php');

@@ -285,7 +285,7 @@ public function taxonomy(Request $request, $taxonomytype, $slug)
 
     private function getPagedRecords($contenttypeslug = 'posts')
     {
-        $app = ResourceManager::getApp();
+        $app = $this->app;
 
         $contenttype = $app['storage']->getContentType($contenttypeslug);
 
@@ -293,32 +293,32 @@ public function taxonomy(Request $request, $taxonomytype, $slug)
         // First, get some content
         $page = $app['request']->query->get($pagerid, $app['request']->query->get('page', 1));
 
-//        // Theme value takes precedence over CT & default config
-//        // @see https://github.com/bolt/bolt/issues/3951
-//        if (!$amount = $app['config']->get('theme/listing_records', false)) {
-//            $amount = empty($contenttype['listing_records']) ? $app['config']->get('general/listing_records') : $contenttype['listing_records'];
-//        }
-//        if (!$order = $app['config']->get('theme/listing_sort', false)) {
-//            $order = empty($contenttype['sort']) ? null : $contenttype['sort'];
-//        }
-//        // If $order is not set, one of two things can happen: Either we let `getContent()` sort by itself, or we
-//        // explicitly set it to sort on the general/listing_sort setting.
-//        if ($order === null) {
-//            $taxonomies = $app['config']->get('taxonomy');
-//            $hassortorder = false;
-//            if (!empty($contenttype['taxonomy'])) {
-//                foreach ($contenttype['taxonomy'] as $contenttypetaxonomy) {
-//                    if ($taxonomies[$contenttypetaxonomy]['has_sortorder']) {
-//                        // We have a taxonomy with a sortorder, so we must keep $order = false, in order
-//                        // to let `getContent()` handle it. We skip the fallback that's a few lines below.
-//                        $hassortorder = true;
-//                    }
-//                }
-//            }
-//            if (!$hassortorder) {
-//                $order = $app['config']->get('general/listing_sort');
-//            }
-//        }
+        // Theme value takes precedence over CT & default config
+        // @see https://github.com/bolt/bolt/issues/3951
+        if (!$amount = $app['config']->get('theme/listing_records', false)) {
+            $amount = empty($contenttype['listing_records']) ? $app['config']->get('general/listing_records') : $contenttype['listing_records'];
+        }
+        if (!$order = $app['config']->get('theme/listing_sort', false)) {
+            $order = empty($contenttype['sort']) ? null : $contenttype['sort'];
+        }
+        // If $order is not set, one of two things can happen: Either we let `getContent()` sort by itself, or we
+        // explicitly set it to sort on the general/listing_sort setting.
+        if ($order === null) {
+            $taxonomies = $app['config']->get('taxonomy');
+            $hassortorder = false;
+            if (!empty($contenttype['taxonomy'])) {
+                foreach ($contenttype['taxonomy'] as $contenttypetaxonomy) {
+                    if ($taxonomies[$contenttypetaxonomy]['has_sortorder']) {
+                        // We have a taxonomy with a sortorder, so we must keep $order = false, in order
+                        // to let `getContent()` handle it. We skip the fallback that's a few lines below.
+                        $hassortorder = true;
+                    }
+                }
+            }
+            if (!$hassortorder) {
+                $order = $app['config']->get('general/listing_sort');
+            }
+        }
 
         $content = $app['storage']->getContent($contenttype['slug'], ['limit' => $amount, 'order' => $order, 'page' => $page, 'paging' => true]);
 

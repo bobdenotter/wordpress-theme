@@ -15,7 +15,6 @@ function the_post()
     global $posts, $post;
 
     $post = array_pop($posts);
-
 }
 
 
@@ -41,117 +40,6 @@ function the_title( $before = '', $after = '', $echo = true ) {
         echo $title;
     else
         return $title;
-}
-
-
-/**
- * Load header template.
- *
- * Includes the header template for a theme or if a name is specified then a
- * specialised header will be included.
- *
- * For the parameter, if the file is called "header-special.php" then specify
- * "special".
- *
- * @since 1.5.0
- *
- * @param string $name The name of the specialised header.
- */
-function get_header( $name = null ) {
-    /**
-     * Fires before the header template file is loaded.
-     *
-     * The hook allows a specific header template file to be used in place of the
-     * default header template file. If your file is called header-new.php,
-     * you would specify the filename in the hook as get_header( 'new' ).
-     *
-     * @since 2.1.0
-     * @since 2.8.0 $name parameter added.
-     *
-     * @param string $name Name of the specific header file to use.
-     */
-    do_action( 'get_header', $name );
-
-    $templates = array();
-    $name = (string) $name;
-    if ( '' !== $name )
-        $templates[] = "header-{$name}.php";
-
-    $templates[] = 'header.php';
-
-    // Backward compat code will be removed in a future release
-    if ('' == locate_template($templates, true))
-        load_template( ABSPATH . WPINC . '/theme-compat/header.php');
-}
-
-
-function get_footer( $name = null ) {
-    /**
-     * Fires before the footer template file is loaded.
-     *
-     * The hook allows a specific footer template file to be used in place of the
-     * default footer template file. If your file is called footer-new.php,
-     * you would specify the filename in the hook as get_footer( 'new' ).
-     *
-     * @since 2.1.0
-     * @since 2.8.0 $name parameter added.
-     *
-     * @param string $name Name of the specific footer file to use.
-     */
-    do_action( 'get_footer', $name );
-
-    $templates = array();
-    $name = (string) $name;
-    if ( '' !== $name )
-        $templates[] = "footer-{$name}.php";
-
-    $templates[] = 'footer.php';
-
-    // Backward compat code will be removed in a future release
-    if ('' == locate_template($templates, true))
-        load_template( ABSPATH . WPINC . '/theme-compat/footer.php');
-}
-
-
-
-function bloginfo()
-{
-    global $content, $config;
-
-    echo $config->get('general/sitename');
-}
-
-
-
-
-
-/**
- * Fire the wp_head action
- *
- * @since 1.2.0
- */
-function wp_head() {
-    /**
-     * Print scripts or data in the head tag on the front end.
-     *
-     * @since 1.5.0
-     */
-
-    do_action( 'wp_head' );
-}
-
-/**
- * Fire the wp_footer action
- *
- * @since 1.5.1
- */
-function wp_footer() {
-    /**
-     * Print scripts or data before the closing body tag on the front end.
-     *
-     * @since 1.5.1
-     */
-    do_action( 'wp_footer' );
 }
 
 
@@ -405,148 +293,9 @@ function home_url()
 
 }
 
-function get_bloginfo($show = '', $filter = 'raw')
-{
-    global $content, $config;
-
-        switch( $show ) {
-                case 'home' : // DEPRECATED
-                case 'siteurl' : // DEPRECATED
-                        _deprecated_argument( __FUNCTION__, '2.2', sprintf(
-                                /* translators: 1: 'siteurl'/'home' argument, 2: bloginfo() function name, 3: 'url' argument */
-                                __( 'The %1$s option is deprecated for the family of %2$s functions. Use the %3$s option instead.' ),
-                                '<code>' . $show . '</code>',
-                                '<code>bloginfo()</code>',
-                                '<code>url</code>'
-                        ) );
-                case 'url' :
-                        $output = home_url();
-                        break;
-                case 'wpurl' :
-                        $output = site_url();
-                        break;
-                case 'description':
-                        $output = $config->get('general/payoff');
-                        break;
-                case 'rdf_url':
-                        $output = get_feed_link('rdf');
-                        break;
-                case 'rss_url':
-                        $output = get_feed_link('rss');
-                        break;
-                case 'rss2_url':
-                        $output = get_feed_link('rss2');
-                        break;
-                case 'atom_url':
-                        $output = get_feed_link('atom');
-                        break;
-                case 'comments_atom_url':
-                        $output = get_feed_link('comments_atom');
-                        break;
-                case 'comments_rss2_url':
-                        $output = get_feed_link('comments_rss2');
-                        break;
-                case 'pingback_url':
-                        $output = site_url( 'xmlrpc.php' );
-                        break;
-                case 'stylesheet_url':
-                        $output = get_stylesheet_uri();
-                        break;
-                case 'stylesheet_directory':
-                        $output = get_stylesheet_directory_uri();
-                        break;
-                case 'template_directory':
-                case 'template_url':
-                        $output = get_template_directory_uri();
-                        break;
-                case 'admin_email':
-                        $output = get_option('admin_email');
-                        break;
-                case 'charset':
-                        $output = get_option('blog_charset');
-                        if ('' == $output) $output = 'UTF-8';
-                        break;
-                case 'html_type' :
-                        $output = get_option('html_type');
-                        break;
-                case 'version':
-                        global $wp_version;
-                        $output = $wp_version;
-                        break;
-                case 'language':
-                        $output = get_locale();
-                        $output = str_replace('_', '-', $output);
-                        break;
-                case 'text_direction':
-                        _deprecated_argument( __FUNCTION__, '2.2', sprintf(
-                                /* translators: 1: 'text_direction' argument, 2: bloginfo() function name, 3: is_rtl() function name */
-                                __( 'The %1$s option is deprecated for the family of %2$s functions. Use the %3$s function instead.' ),
-                                '<code>' . $show . '</code>',
-                                '<code>bloginfo()</code>',
-                                '<code>is_rtl()</code>'
-                        ) );
-                        if ( function_exists( 'is_rtl' ) ) {
-                                $output = is_rtl() ? 'rtl' : 'ltr';
-                        } else {
-                                $output = 'ltr';
-                        }
-                        break;
-                case 'name':
-                default:
-                        $output = get_option('blogname');
-                        break;
-        }
-
-        $url = true;
-        if (strpos($show, 'url') === false &&
-                strpos($show, 'directory') === false &&
-                strpos($show, 'home') === false)
-                $url = false;
-
-        if ( 'display' == $filter ) {
-                if ( $url ) {
-                        /**
-                         * Filter the URL returned by get_bloginfo().
-                         *
-                         * @since 2.0.5
-                         *
-                         * @param mixed $output The URL returned by bloginfo().
-                         * @param mixed $show   Type of information requested.
-                         */
-                        $output = apply_filters( 'bloginfo_url', $output, $show );
-                } else {
-                        /**
-                         * Filter the site information returned by get_bloginfo().
-                         *
-                         * @since 0.71
-                         *
-                         * @param mixed $output The requested non-URL site information.
-                         * @param mixed $show   Type of information requested.
-                         */
-                        $output = apply_filters( 'bloginfo', $output, $show );
-                }
-        }
-
-        return $output;
-}
 
 
-function get_sidebar()
-{
-    require('sidebar.php');
 
-}
-
-
-function get_template_part($slug)
-{
-    if (is_readable($slug . '.php')) {
-        return include($slug . '.php');
-    } else {
-        return "[get_template_part]";
-    }
-
-}
 
 
 function post_password_required()
@@ -572,58 +321,6 @@ function is_admin()
     return (!empty($currentuser) && !empty($currentuser['username']));
 }
 
-/**
- * Displays the language attributes for the html tag.
- *
- * Builds up a set of html attributes containing the text direction and language
- * information for the page.
- *
- * @since 2.1.0
- * @since 4.3.0 Converted into a wrapper for get_language_attributes().
- *
- * @param string $doctype Optional. The type of html document. Accepts 'xhtml' or 'html'. Default 'html'.
- */
-function language_attributes( $doctype = 'html' ) {
-    echo get_language_attributes( $doctype );
-}
-
-/**
- * Gets the language attributes for the html tag.
- *
- * Builds up a set of html attributes containing the text direction and language
- * information for the page.
- *
- * @since 4.3.0
- *
- * @param string $doctype Optional. The type of html document. Accepts 'xhtml' or 'html'. Default 'html'.
- */
-function get_language_attributes( $doctype = 'html' ) {
-    $attributes = array();
-
-    if ( function_exists( 'is_rtl' ) && is_rtl() )
-        $attributes[] = 'dir="rtl"';
-
-    if ( $lang = get_bloginfo('language') ) {
-        if ( get_option('html_type') == 'text/html' || $doctype == 'html' )
-            $attributes[] = "lang=\"$lang\"";
-
-        if ( get_option('html_type') != 'text/html' || $doctype == 'xhtml' )
-            $attributes[] = "xml:lang=\"$lang\"";
-    }
-
-    $output = implode(' ', $attributes);
-
-    /**
-     * Filter the language attributes for display in the html tag.
-     *
-     * @since 2.5.0
-     * @since 4.3.0 Added the `$doctype` parameter.
-     *
-     * @param string $output A space-separated list of language attributes.
-     * @param string $doctype The type of html document (xhtml|html).
-     */
-    return apply_filters( 'language_attributes', $output, $doctype );
-}
 
 
 /**
@@ -2414,14 +2111,6 @@ function wp_loginout()
 }
 
 /**
- * Stub for wp_meta.
- */
-function wp_meta()
-{
-    WordpressHelper::stub('wp_meta', func_get_args());
-}
-
-/**
  * Stub for esc_attr__.
  */
 function esc_attr__()
@@ -2926,30 +2615,6 @@ function wp_send_json_error( $data = null ) {
 }
 
 /**
- * Stub for the_archive_title.
- */
-function the_archive_title()
-{
-    WordpressHelper::stub('the_archive_title', func_get_args());
-}
-
-/**
- * Stub for the_archive_description.
- */
-function the_archive_description()
-{
-    WordpressHelper::stub('the_archive_description', func_get_args());
-}
-
-/**
- * Stub for get_search_query.
- */
-function get_search_query()
-{
-    WordpressHelper::stub('get_search_query', func_get_args());
-}
-
-/**
  * Stub for has_category.
  */
 function has_category()
@@ -3035,4 +2700,76 @@ function the_excerpt()
 function wp_get_recent_posts()
 {
     WordpressHelper::stub('wp_get_recent_posts', func_get_args());
+}
+
+/**
+ * Stub for site_url.
+ */
+function site_url()
+{
+    WordpressHelper::stub('site_url', func_get_args());
+}
+
+/**
+ * Stub for is_category.
+ */
+function is_category()
+{
+    WordpressHelper::stub('is_category', func_get_args());
+}
+
+/**
+ * Stub for is_tag.
+ */
+function is_tag()
+{
+    WordpressHelper::stub('is_tag', func_get_args());
+}
+
+/**
+ * Stub for is_year.
+ */
+function is_year()
+{
+    WordpressHelper::stub('is_year', func_get_args());
+}
+
+/**
+ * Stub for is_month.
+ */
+function is_month()
+{
+    WordpressHelper::stub('is_month', func_get_args());
+}
+
+/**
+ * Stub for is_day.
+ */
+function is_day()
+{
+    WordpressHelper::stub('is_day', func_get_args());
+}
+
+/**
+ * Stub for is_tax.
+ */
+function is_tax()
+{
+    WordpressHelper::stub('is_tax', func_get_args());
+}
+
+/**
+ * Stub for is_post_type_archive.
+ */
+function is_post_type_archive()
+{
+    WordpressHelper::stub('is_post_type_archive', func_get_args());
+}
+
+/**
+ * Stub for term_description.
+ */
+function term_description()
+{
+    WordpressHelper::stub('term_description', func_get_args());
 }

@@ -29,7 +29,9 @@ class WordpressHelper {
         require_once($dirname . 'nav-menu-template.php');
         require_once($dirname . 'script-loader.php');
         require_once($dirname . 'theme.php');
+        // require_once($dirname . 'query.php');
         require_once($dirname . 'widgets.php');
+        require_once($dirname . 'general-template.php');
         require_once($dirname . 'wp-functions.php');
         require_once($dirname . 'wp-plugin.php');
 
